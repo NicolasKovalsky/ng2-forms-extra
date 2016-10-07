@@ -2,11 +2,12 @@ import {CommonModule} from "@angular/common";
 import {NgModule} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {SubmitReadyDirective} from "./submit-ready.directive";
-import {InputDirective} from "./input.directive";
-import {InputStatusDirective} from "./input-status.directive";
-import {InputErrorsComponent} from "./input-errors.component";
 import {NonBlankDirective} from "./non-blank.directive";
 import {RepeatOfDirective} from "./repeat-of.directive";
+import {InputDirective} from "./input.directive";
+import {InputControlDirective} from "./input-control.directive";
+import {InputErrorsComponent} from "./input-errors.component";
+import {InputStatusDirective} from "./input-status.directive";
 
 @NgModule({
     imports: [
@@ -18,8 +19,9 @@ import {RepeatOfDirective} from "./repeat-of.directive";
         NonBlankDirective,
         RepeatOfDirective,
         InputDirective,
-        InputStatusDirective,
+        InputControlDirective,
         InputErrorsComponent,
+        InputStatusDirective,
     ],
     exports: [
         FormsModule,
@@ -27,8 +29,9 @@ import {RepeatOfDirective} from "./repeat-of.directive";
         NonBlankDirective,
         RepeatOfDirective,
         InputDirective,
-        InputStatusDirective,
+        InputControlDirective,
         InputErrorsComponent,
+        InputStatusDirective,
     ]
 })
 export class FormsExtraModule {

@@ -1,5 +1,5 @@
 import {Directive, HostBinding} from "@angular/core";
-import {InputService} from "./input.service";
+import {InputService} from "./model";
 
 @Directive({
     selector: '[inputStatus]',

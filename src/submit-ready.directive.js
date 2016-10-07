@@ -13,71 +13,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Directive, HostListener, Output, EventEmitter, forwardRef } from "@angular/core";
-import { SubmitService } from "./submit.service";
-var resolved = Promise.resolve();
+import { SubmitService, SubmitGroup } from "./model";
 export var SubmitReadyDirective = (function (_super) {
     __extends(SubmitReadyDirective, _super);
     function SubmitReadyDirective() {
         _super.call(this);
-        this.readyStateChanges = new EventEmitter();
         this.preSubmit = new EventEmitter();
         this.submitReady = new EventEmitter();
-        this._ready = true;
-        this._idSeq = 0;
-        this._readyForSubmit = {};
     }
-    Object.defineProperty(SubmitReadyDirective.prototype, "ready", {
-        get: function () {
-            return this._ready;
-        },
-        enumerable: true,
-        configurable: true
-    });
     SubmitReadyDirective.prototype.onSubmit = function () {
         this.submit();
-    };
-    SubmitReadyDirective.prototype.addReadyForSubmit = function (ready) {
-        var _this = this;
-        var id = "" + ++this._idSeq;
-        this._readyForSubmit[id] = ready;
-        var subscr = ready.readyStateChanges.subscribe(function (ready) {
-            if (!ready) {
-                resolved.then(function () { return _this.setReadyState(false); });
-            }
-            else {
-                resolved.then(function () { return _this.updateReadyState(); });
-            }
-        });
-        return {
-            unregister: function () {
-                delete _this._readyForSubmit[id];
-                subscr.unsubscribe();
-            }
-        };
-    };
-    SubmitReadyDirective.prototype.updateReadyState = function (_a) {
-        var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        var ready = true;
-        for (var id in this._readyForSubmit) {
-            if (this._readyForSubmit.hasOwnProperty(id)) {
-                if (!this._readyForSubmit[id].updateReadyState({ emitEvents: emitEvents })) {
-                    ready = false;
-                    break;
-                }
-            }
-        }
-        this.setReadyState(ready, { emitEvents: emitEvents });
-        return ready;
-    };
-    SubmitReadyDirective.prototype.setReadyState = function (ready, _a) {
-        var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        if (this._ready === ready) {
-            return;
-        }
-        this._ready = ready;
-        if (emitEvents !== false) {
-            this.readyStateChanges.emit(ready);
-        }
     };
     SubmitReadyDirective.prototype.submit = function () {
         this._submitted = true;
@@ -91,10 +36,6 @@ export var SubmitReadyDirective = (function (_super) {
     SubmitReadyDirective.prototype.ngOnDestroy = function () {
         this.submitReady.complete();
     };
-    __decorate([
-        Output(), 
-        __metadata('design:type', Object)
-    ], SubmitReadyDirective.prototype, "readyStateChanges", void 0);
     __decorate([
         Output(), 
         __metadata('design:type', Object)
@@ -117,6 +58,10 @@ export var SubmitReadyDirective = (function (_super) {
                 {
                     provide: SubmitService,
                     useExisting: forwardRef(function () { return SubmitReadyDirective; }),
+                },
+                {
+                    provide: SubmitGroup,
+                    useExisting: SubmitService,
                 },
             ]
         }), 

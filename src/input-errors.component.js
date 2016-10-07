@@ -11,8 +11,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 import { Component, Input, Optional } from "@angular/core";
-import { AbstractControl } from "@angular/forms";
-import { InputService } from "./input.service";
+import { InputService } from "./model";
 var DEFAULT_INPUT_ERRORS_MAP = {
     required: "This field is required",
     minlength: function (error) {
@@ -28,24 +27,13 @@ var DEFAULT_INPUT_ERRORS_MAP = {
         return "The value is too long";
     },
 };
+var resolved = Promise.resolve();
 export var InputErrorsComponent = (function () {
     function InputErrorsComponent(_inputService) {
         this._inputService = _inputService;
         this._errors = [];
         this.inputErrorsMap = {};
     }
-    Object.defineProperty(InputErrorsComponent.prototype, "inputErrors", {
-        set: function (input) {
-            if (this._input === input) {
-                return;
-            }
-            this._input = input;
-            this.unsubscribe();
-            this.subscribe();
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(InputErrorsComponent.prototype, "hasErrors", {
         get: function () {
             return !this._inputService.ready && this.errors.length > 0;
@@ -61,35 +49,24 @@ export var InputErrorsComponent = (function () {
         configurable: true
     });
     InputErrorsComponent.prototype.ngOnInit = function () {
-        if (!this._subscription) {
-            this.subscribe();
-        }
-    };
-    InputErrorsComponent.prototype.ngAfterViewInit = function () {
-        if (!this._subscription) {
-            this.subscribe();
-        }
+        var _this = this;
+        this._subscription = this._inputService.submittableChanges.subscribe(function (controls) { return _this.updateInputs(controls); });
+        this.updateInputs(this._inputService.submittables);
     };
     InputErrorsComponent.prototype.ngOnDestroy = function () {
-        this.unsubscribe();
+        if (this._subscription) {
+            this._subscription.unsubscribe();
+            delete this._subscription;
+        }
     };
     InputErrorsComponent.prototype.trackError = function (error) {
         return error.key;
     };
-    InputErrorsComponent.prototype.subscribe = function () {
-        var _this = this;
-        if (this._input) {
-            this._subscription = this._input.statusChanges.subscribe(function () { return _this.updateInputs([_this._input]); });
-        }
-        else if (this._inputService) {
-            this._subscription = this._inputService.controlChanges.subscribe(function () { return _this.updateInputs(_this._inputService.controls); });
-        }
-    };
     InputErrorsComponent.prototype.updateInputs = function (controls) {
         var _this = this;
-        var updateErrors = function () {
+        var updateErrors = function () { return resolved.then(function () {
             _this._errors.splice(0);
-            controls.filter(function (control) { return !!control.errors; }).forEach(function (control) {
+            controls.map(function (s) { return s.control; }).filter(function (control) { return !!control.errors; }).forEach(function (control) {
                 var errors = control.errors;
                 for (var key in errors) {
                     if (errors.hasOwnProperty(key)) {
@@ -100,8 +77,8 @@ export var InputErrorsComponent = (function () {
                     }
                 }
             });
-        };
-        controls.forEach(function (control) { return control.statusChanges.subscribe(updateErrors); });
+        }); };
+        controls.forEach(function (s) { return s.control.statusChanges.subscribe(updateErrors); });
         updateErrors();
     };
     InputErrorsComponent.prototype.errorMessage = function (control, key, value) {
@@ -121,21 +98,10 @@ export var InputErrorsComponent = (function () {
         }
         return key;
     };
-    InputErrorsComponent.prototype.unsubscribe = function () {
-        if (this._subscription) {
-            this._subscription.unsubscribe();
-            this._subscription = undefined;
-        }
-    };
     __decorate([
         Input(), 
         __metadata('design:type', Object)
     ], InputErrorsComponent.prototype, "inputErrorsMap", void 0);
-    __decorate([
-        Input(), 
-        __metadata('design:type', AbstractControl), 
-        __metadata('design:paramtypes', [AbstractControl])
-    ], InputErrorsComponent.prototype, "inputErrors", null);
     InputErrorsComponent = __decorate([
         Component({
             selector: 'input-errors,[inputErrors],[inputErrorsMap]',

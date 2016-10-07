@@ -1,7 +1,7 @@
-import {Component, Input, OnDestroy, AfterViewInit, Optional, OnInit} from "@angular/core";
+import {Component, Input, OnDestroy, Optional, OnInit} from "@angular/core";
 import {AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
-import {InputService} from "./input.service";
+import {InputService, SubmittableControl} from "./model";
 
 export interface InputErrorMap {
     [key: string]: string | ((error: any, control: AbstractControl) => string)
@@ -28,6 +28,8 @@ export interface InputError {
     message: string;
 }
 
+const resolved = Promise.resolve();
+
 @Component({
     selector: 'input-errors,[inputErrors],[inputErrorsMap]',
     template:
@@ -41,9 +43,8 @@ export interface InputError {
         '[class.frex-errors-hidden]': '!hasErrors',
     }
 })
-export class InputErrorsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class InputErrorsComponent implements OnInit, OnDestroy {
 
-    private _input: AbstractControl;
     private _subscription?: Subscription;
     private _errors: InputError[] = [];
 
@@ -51,16 +52,6 @@ export class InputErrorsComponent implements OnInit, AfterViewInit, OnDestroy {
     private inputErrorsMap: InputErrorMap = {};
 
     constructor(@Optional() private _inputService: InputService) {
-    }
-
-    @Input()
-    set inputErrors(input: AbstractControl) {
-        if (this._input === input) {
-            return;
-        }
-        this._input = input;
-        this.unsubscribe();
-        this.subscribe();
     }
 
     get hasErrors(): boolean {
@@ -72,40 +63,27 @@ export class InputErrorsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit() {
-        if (!this._subscription) {
-            this.subscribe();
-        }
-    }
-
-    ngAfterViewInit() {
-        if (!this._subscription) {
-            this.subscribe();
-        }
+        this._subscription = this._inputService.submittableChanges.subscribe(
+            (controls: SubmittableControl[]) => this.updateInputs(controls));
+        this.updateInputs(this._inputService.submittables);
     }
 
     ngOnDestroy() {
-        this.unsubscribe()
+        if (this._subscription) {
+            this._subscription.unsubscribe();
+            delete this._subscription;
+        }
     }
 
     private trackError(error: InputError) {
         return error.key;
     }
 
-    private subscribe() {
-        if (this._input) {
-            this._subscription = this._input.statusChanges.subscribe(
-                () => this.updateInputs([this._input]));
-        } else if (this._inputService) {
-            this._subscription = this._inputService.controlChanges.subscribe(
-                () => this.updateInputs(this._inputService.controls));
-        }
-    }
+    private updateInputs(controls: SubmittableControl[]) {
 
-    private updateInputs(controls: AbstractControl[]) {
-
-        const updateErrors = () => {
+        const updateErrors = () => resolved.then(() => {
             this._errors.splice(0);
-            controls.filter(control => !!control.errors).forEach(control => {
+            controls.map(s => s.control).filter(control => !!control.errors).forEach(control => {
 
                 const errors = control.errors;
 
@@ -120,9 +98,9 @@ export class InputErrorsComponent implements OnInit, AfterViewInit, OnDestroy {
                     }
                 }
             });
-        };
+        });
 
-        controls.forEach(control => control.statusChanges.subscribe(updateErrors));
+        controls.forEach(s => s.control.statusChanges.subscribe(updateErrors));
         updateErrors();
     }
 
@@ -147,13 +125,6 @@ export class InputErrorsComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         return key;
-    }
-
-    private unsubscribe() {
-        if (this._subscription) {
-            this._subscription.unsubscribe();
-            this._subscription = undefined;
-        }
     }
 
 }
