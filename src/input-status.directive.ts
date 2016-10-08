@@ -1,5 +1,5 @@
 import {Directive, HostBinding} from "@angular/core";
-import {InputService} from "./input.service";
+import {InputService} from "./model";
 
 @Directive({
     selector: '[inputStatus]',
@@ -11,7 +11,7 @@ export class InputStatusDirective {
 
     @HostBinding("class.frex-invalid")
     get invalid(): boolean {
-        return !this._inputService.ready;
+        return !this._inputService.inputStatus.ready;
     }
 
 }

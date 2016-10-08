@@ -11,8 +11,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 import { Component, Input, Optional } from "@angular/core";
-import { AbstractControl } from "@angular/forms";
-import { InputService } from "./input.service";
+import { SubmitGroup } from "./model";
 var DEFAULT_INPUT_ERRORS_MAP = {
     required: "This field is required",
     minlength: function (error) {
@@ -28,27 +27,16 @@ var DEFAULT_INPUT_ERRORS_MAP = {
         return "The value is too long";
     },
 };
+var resolved = Promise.resolve();
 export var InputErrorsComponent = (function () {
-    function InputErrorsComponent(_inputService) {
-        this._inputService = _inputService;
+    function InputErrorsComponent(_submitGroup) {
+        this._submitGroup = _submitGroup;
         this._errors = [];
         this.inputErrorsMap = {};
     }
-    Object.defineProperty(InputErrorsComponent.prototype, "inputErrors", {
-        set: function (input) {
-            if (this._input === input) {
-                return;
-            }
-            this._input = input;
-            this.unsubscribe();
-            this.subscribe();
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(InputErrorsComponent.prototype, "hasErrors", {
         get: function () {
-            return !this._inputService.ready && this.errors.length > 0;
+            return !this._submitGroup.inputStatus.ready && this.errors.length > 0;
         },
         enumerable: true,
         configurable: true
@@ -61,47 +49,38 @@ export var InputErrorsComponent = (function () {
         configurable: true
     });
     InputErrorsComponent.prototype.ngOnInit = function () {
-        if (!this._subscription) {
-            this.subscribe();
-        }
-    };
-    InputErrorsComponent.prototype.ngAfterViewInit = function () {
-        if (!this._subscription) {
-            this.subscribe();
-        }
+        var _this = this;
+        this._subscription = this._submitGroup.submittableChanges.subscribe(function (submittables) { return _this.updateSubmittables(submittables); });
+        this.updateSubmittables(this._submitGroup.submittables);
     };
     InputErrorsComponent.prototype.ngOnDestroy = function () {
-        this.unsubscribe();
+        if (this._subscription) {
+            this._subscription.unsubscribe();
+            delete this._subscription;
+        }
     };
     InputErrorsComponent.prototype.trackError = function (error) {
         return error.key;
     };
-    InputErrorsComponent.prototype.subscribe = function () {
+    InputErrorsComponent.prototype.updateSubmittables = function (submittables) {
         var _this = this;
-        if (this._input) {
-            this._subscription = this._input.statusChanges.subscribe(function () { return _this.updateInputs([_this._input]); });
-        }
-        else if (this._inputService) {
-            this._subscription = this._inputService.controlChanges.subscribe(function () { return _this.updateInputs(_this._inputService.controls); });
-        }
-    };
-    InputErrorsComponent.prototype.updateInputs = function (controls) {
-        var _this = this;
-        var updateErrors = function () {
+        var updateErrors = function () { return resolved.then(function () {
             _this._errors.splice(0);
-            controls.filter(function (control) { return !!control.errors; }).forEach(function (control) {
-                var errors = control.errors;
-                for (var key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        var message = _this.errorMessage(control, key, errors[key]);
-                        if (message != null) {
-                            _this._errors.push({ key: key, message: message });
+            submittables.forEach(function (submittable) {
+                var errors = submittable.inputStatus.errors;
+                if (errors) {
+                    for (var key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            var message = _this.errorMessage(submittable, key, errors[key]);
+                            if (message != null) {
+                                _this._errors.push({ key: key, message: message });
+                            }
                         }
                     }
                 }
             });
-        };
-        controls.forEach(function (control) { return control.statusChanges.subscribe(updateErrors); });
+        }); };
+        submittables.forEach(function (s) { return s.inputStatusChange.subscribe(updateErrors); });
         updateErrors();
     };
     InputErrorsComponent.prototype.errorMessage = function (control, key, value) {
@@ -121,42 +100,31 @@ export var InputErrorsComponent = (function () {
         }
         return key;
     };
-    InputErrorsComponent.prototype.unsubscribe = function () {
-        if (this._subscription) {
-            this._subscription.unsubscribe();
-            this._subscription = undefined;
-        }
-    };
     __decorate([
         Input(), 
         __metadata('design:type', Object)
     ], InputErrorsComponent.prototype, "inputErrorsMap", void 0);
-    __decorate([
-        Input(), 
-        __metadata('design:type', AbstractControl), 
-        __metadata('design:paramtypes', [AbstractControl])
-    ], InputErrorsComponent.prototype, "inputErrors", null);
     InputErrorsComponent = __decorate([
         Component({
             selector: 'input-errors,[inputErrors],[inputErrorsMap]',
             template: "\n    <ul class=\"frex-error-list\" *ngIf=\"hasErrors\">\n        <li *ngFor=\"let error of errors; trackBy: trackError\" class=\"frex-error\">{{error.message}}</li>\n    </ul>\n    ",
             host: {
                 '[class.frex-errors]': 'true',
-                '[class.frex-errors-hidden]': '!hasErrors',
+                '[class.frex-no-errors]': '!hasErrors',
             }
         }),
         __param(0, Optional()), 
-        __metadata('design:paramtypes', [InputService])
+        __metadata('design:paramtypes', [SubmitGroup])
     ], InputErrorsComponent);
     return InputErrorsComponent;
 }());
-function errorMessage(control, value, message) {
+function errorMessage(submittable, value, message) {
     if (message == null) {
         return undefined;
     }
     if (typeof message === "string") {
         return message;
     }
-    return message(value, control);
+    return message(value, submittable);
 }
 //# sourceMappingURL=input-errors.component.js.map

@@ -8,14 +8,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Directive, HostBinding } from "@angular/core";
-import { InputService } from "./input.service";
+import { InputService } from "./model";
 export var InputStatusDirective = (function () {
     function InputStatusDirective(_inputService) {
         this._inputService = _inputService;
     }
     Object.defineProperty(InputStatusDirective.prototype, "invalid", {
         get: function () {
-            return !this._inputService.ready;
+            return !this._inputService.inputStatus.ready;
         },
         enumerable: true,
         configurable: true

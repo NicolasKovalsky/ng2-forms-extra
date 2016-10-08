@@ -1,29 +1,23 @@
-import { OnDestroy, AfterViewInit, OnInit } from "@angular/core";
-import { AbstractControl } from "@angular/forms";
-import { InputService } from "./input.service";
+import { OnDestroy, OnInit } from "@angular/core";
+import { Submittable, SubmitGroup } from "./model";
 export interface InputErrorMap {
-    [key: string]: string | ((error: any, control: AbstractControl) => string);
+    [key: string]: string | ((error: any, submittable: Submittable) => string);
 }
 export interface InputError {
     key: string;
     message: string;
 }
-export declare class InputErrorsComponent implements OnInit, AfterViewInit, OnDestroy {
-    private _inputService;
-    private _input;
+export declare class InputErrorsComponent implements OnInit, OnDestroy {
+    private _submitGroup;
     private _subscription?;
     private _errors;
     private inputErrorsMap;
-    constructor(_inputService: InputService);
-    inputErrors: AbstractControl;
+    constructor(_submitGroup: SubmitGroup);
     readonly hasErrors: boolean;
     readonly errors: InputError[];
     ngOnInit(): void;
-    ngAfterViewInit(): void;
     ngOnDestroy(): void;
     private trackError(error);
-    private subscribe();
-    private updateInputs(controls);
+    private updateSubmittables(submittables);
     private errorMessage(control, key, value);
-    private unsubscribe();
 }
