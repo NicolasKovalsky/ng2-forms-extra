@@ -1,9 +1,9 @@
 import {Component, Input, OnDestroy, Optional, OnInit} from "@angular/core";
 import {Subscription} from "rxjs";
-import {InputService, SubmittableControl} from "./model";
+import {InputService, Submittable} from "./model";
 
 export interface InputErrorMap {
-    [key: string]: string | ((error: any, control: SubmittableControl) => string)
+    [key: string]: string | ((error: any, submittable: Submittable) => string)
 }
 
 const DEFAULT_INPUT_ERRORS_MAP: InputErrorMap = {
@@ -63,8 +63,8 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this._subscription = this._inputService.submittableChanges.subscribe(
-            (controls: SubmittableControl[]) => this.updateInputs(controls));
-        this.updateInputs(this._inputService.submittables);
+            (submittables: Submittable[]) => this.updateSubmittables(submittables));
+        this.updateSubmittables(this._inputService.submittables);
     }
 
     ngOnDestroy() {
@@ -78,11 +78,11 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
         return error.key;
     }
 
-    private updateInputs(controls: SubmittableControl[]) {
+    private updateSubmittables(submittables: Submittable[]) {
 
         const updateErrors = () => resolved.then(() => {
             this._errors.splice(0);
-            controls.forEach(submittable => {
+            submittables.forEach(submittable => {
 
                 const errors = submittable.inputStatus.errors;
 
@@ -101,11 +101,11 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
             });
         });
 
-        controls.forEach(s => s.control.statusChanges.subscribe(updateErrors));
+        submittables.forEach(s => s.inputStatusChange.subscribe(updateErrors));
         updateErrors();
     }
 
-    private errorMessage(control: SubmittableControl, key: string, value: any): string | undefined {
+    private errorMessage(control: Submittable, key: string, value: any): string | undefined {
         if (value == null) {
             return undefined;
         }
@@ -131,14 +131,14 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
 }
 
 function errorMessage(
-    control: SubmittableControl,
+    submittable: Submittable,
     value: any,
-    message: undefined | string | ((value: any, control: SubmittableControl) => string)): string | undefined {
+    message: undefined | string | ((value: any, submittable: Submittable) => string)): string | undefined {
     if (message == null) {
         return undefined;
     }
     if (typeof message === "string") {
         return message;
     }
-    return message(value, control);
+    return message(value, submittable);
 }

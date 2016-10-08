@@ -74,10 +74,10 @@ export class Registry<T> {
 
 const resolved = Promise.resolve();
 
-export abstract class SubmitGroup<S extends Submittable> extends Submittable {
+export abstract class SubmitGroup extends Submittable {
 
     readonly inputStatusChange = new EventEmitter<InputStatus>();
-    private _registry = new Registry<S>();
+    private _registry = new Registry<Submittable>();
     private _inputStatus = InputReady;
 
     constructor() {
@@ -88,11 +88,11 @@ export abstract class SubmitGroup<S extends Submittable> extends Submittable {
         return this._inputStatus;
     }
 
-    get submittableChanges(): EventEmitter<S[]> {
+    get submittableChanges(): EventEmitter<Submittable[]> {
         return this._registry.changes;
     }
 
-    get submittables(): S[] {
+    get submittables(): Submittable[] {
         return this._registry.list;
     }
 
@@ -117,7 +117,7 @@ export abstract class SubmitGroup<S extends Submittable> extends Submittable {
         }
     }
 
-    addSubmittable(submittable: S): RegistryHandle {
+    addSubmittable(submittable: Submittable): RegistryHandle {
 
         let subscr: Subscription;
         const reg = this.registerSubmittable(submittable);
@@ -136,7 +136,7 @@ export abstract class SubmitGroup<S extends Submittable> extends Submittable {
         return handle;
     }
 
-    protected registerSubmittable(_submittable: S): RegistryHandle {
+    protected registerSubmittable(_submittable: Submittable): RegistryHandle {
         return {
             unregister() {}
         }
@@ -150,10 +150,10 @@ export abstract class SubmittableControl extends Submittable {
 
 }
 
-export abstract class InputService extends SubmitGroup<SubmittableControl> {
+export abstract class InputService extends SubmitGroup {
 }
 
-export abstract class SubmitService extends SubmitGroup<Submittable> {
+export abstract class SubmitService extends SubmitGroup {
 
     abstract readonly preSubmit: EventEmitter<any>;
     abstract readonly submitReady: EventEmitter<any>;

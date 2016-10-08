@@ -1,3 +1,5 @@
+import {AbstractControl} from "@angular/forms";
+
 export abstract class InputStatus {
 
     constructor(private _id: string) {
@@ -23,6 +25,13 @@ export abstract class InputStatus {
         const errors = this.get(inputErrorsId);
 
         return errors && errors.errors;
+    }
+
+    get control(): AbstractControl | undefined {
+
+        const statusControl = this.get(inputStatusControlId);
+
+        return statusControl && statusControl.control;
     }
 
     get(id: string | symbol): InputStatus | undefined {
@@ -108,6 +117,9 @@ class CombinedInputStatus extends InputStatus {
     }
 
     add(status: InputStatus): this {
+        if (status.impliedBy(this)) {
+            return this;
+        }
         this._list = undefined;
         if (status.id !== this.id) {
 
@@ -116,7 +128,12 @@ class CombinedInputStatus extends InputStatus {
             if (!prev) {
                 this._map[status.id] = status;
             } else {
-                this._map[status.id] = prev.mergeValues(status);
+
+                const merged = prev.mergeValues(status);
+
+                if (!merged.impliedBy(this)) {
+                    this._map[status.id] = merged;
+                }
             }
         }
         for (let st of status.nested) {
@@ -192,6 +209,38 @@ class InputReadiness extends InputStatus {
 
 export const InputReady: InputStatus = new InputReadiness(true);
 export const InputNotReady: InputStatus = new InputReadiness(false);
+
+const inputStatusControlId = "__control__";
+
+export class InputStatusControl extends InputStatus {
+
+    constructor(private _control?: AbstractControl) {
+        super(inputStatusControlId);
+    }
+
+    get control(): AbstractControl | undefined {
+        return this._control;
+    }
+
+    impliedBy(status: InputStatus): boolean {
+        return !this.control || this.control === status.control;
+    }
+
+    equalValues(status: this): boolean {
+        return this.control === status.control;
+    }
+
+    mergeValues(status: this): this {
+        if (this.control === status.control) {
+            return this;
+        }
+        return noInputStatusControl as this;
+    }
+
+}
+
+const noInputStatusControl = new InputStatusControl(undefined);
+
 
 const inputErrorsId = "__errors__";
 

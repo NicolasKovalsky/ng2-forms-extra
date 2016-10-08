@@ -37,6 +37,14 @@ export var InputStatus = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(InputStatus.prototype, "control", {
+        get: function () {
+            var statusControl = this.get(inputStatusControlId);
+            return statusControl && statusControl.control;
+        },
+        enumerable: true,
+        configurable: true
+    });
     InputStatus.prototype.get = function (id) {
         return id === this.id ? this : undefined;
     };
@@ -105,6 +113,9 @@ var CombinedInputStatus = (function (_super) {
         configurable: true
     });
     CombinedInputStatus.prototype.add = function (status) {
+        if (status.impliedBy(this)) {
+            return this;
+        }
         this._list = undefined;
         if (status.id !== this.id) {
             var prev = this._map[status.id];
@@ -112,7 +123,10 @@ var CombinedInputStatus = (function (_super) {
                 this._map[status.id] = status;
             }
             else {
-                this._map[status.id] = prev.mergeValues(status);
+                var merged = prev.mergeValues(status);
+                if (!merged.impliedBy(this)) {
+                    this._map[status.id] = merged;
+                }
             }
         }
         for (var _i = 0, _a = status.nested; _i < _a.length; _i++) {
@@ -179,6 +193,35 @@ var InputReadiness = (function (_super) {
 }(InputStatus));
 export var InputReady = new InputReadiness(true);
 export var InputNotReady = new InputReadiness(false);
+var inputStatusControlId = "__control__";
+export var InputStatusControl = (function (_super) {
+    __extends(InputStatusControl, _super);
+    function InputStatusControl(_control) {
+        _super.call(this, inputStatusControlId);
+        this._control = _control;
+    }
+    Object.defineProperty(InputStatusControl.prototype, "control", {
+        get: function () {
+            return this._control;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    InputStatusControl.prototype.impliedBy = function (status) {
+        return !this.control || this.control === status.control;
+    };
+    InputStatusControl.prototype.equalValues = function (status) {
+        return this.control === status.control;
+    };
+    InputStatusControl.prototype.mergeValues = function (status) {
+        if (this.control === status.control) {
+            return this;
+        }
+        return noInputStatusControl;
+    };
+    return InputStatusControl;
+}(InputStatus));
+var noInputStatusControl = new InputStatusControl(undefined);
 var inputErrorsId = "__errors__";
 export var InputErrors = (function (_super) {
     __extends(InputErrors, _super);

@@ -1,9 +1,8 @@
 import { OnInit, OnDestroy, EventEmitter } from "@angular/core";
 import { NgControl, AbstractControl } from "@angular/forms";
-import { Submittable, SubmitGroup, SubmitService, InputService, SubmittableControl } from "./model";
+import { Submittable, SubmitGroup, SubmitService } from "./model";
 import { InputStatus } from "./input-status";
-export declare class InputControlDirective extends SubmittableControl implements OnInit, OnDestroy {
-    private _inputService;
+export declare class InputControlDirective extends Submittable implements OnInit, OnDestroy {
     private _submitGroup;
     private _submitService;
     private _control;
@@ -12,13 +11,13 @@ export declare class InputControlDirective extends SubmittableControl implements
     private _regHandle?;
     private _preSubmitSubscr?;
     private _stateSubscr?;
-    constructor(_inputService: InputService, _submitGroup: SubmitGroup<Submittable>, _submitService: SubmitService, _control: NgControl);
+    constructor(_submitGroup: SubmitGroup, _submitService: SubmitService, _control: NgControl);
     readonly inputStatus: InputStatus;
     readonly control: AbstractControl;
     updateInputStatus({emitEvents}?: {
         emitEvents?: boolean;
     }): InputStatus;
-    private inputReadiness();
+    private addReadiness(status);
     private addErrors(status);
     ngOnInit(): void;
     ngOnDestroy(): void;

@@ -50,8 +50,8 @@ export var InputErrorsComponent = (function () {
     });
     InputErrorsComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._subscription = this._inputService.submittableChanges.subscribe(function (controls) { return _this.updateInputs(controls); });
-        this.updateInputs(this._inputService.submittables);
+        this._subscription = this._inputService.submittableChanges.subscribe(function (submittables) { return _this.updateSubmittables(submittables); });
+        this.updateSubmittables(this._inputService.submittables);
     };
     InputErrorsComponent.prototype.ngOnDestroy = function () {
         if (this._subscription) {
@@ -62,11 +62,11 @@ export var InputErrorsComponent = (function () {
     InputErrorsComponent.prototype.trackError = function (error) {
         return error.key;
     };
-    InputErrorsComponent.prototype.updateInputs = function (controls) {
+    InputErrorsComponent.prototype.updateSubmittables = function (submittables) {
         var _this = this;
         var updateErrors = function () { return resolved.then(function () {
             _this._errors.splice(0);
-            controls.forEach(function (submittable) {
+            submittables.forEach(function (submittable) {
                 var errors = submittable.inputStatus.errors;
                 if (errors) {
                     for (var key in errors) {
@@ -80,7 +80,7 @@ export var InputErrorsComponent = (function () {
                 }
             });
         }); };
-        controls.forEach(function (s) { return s.control.statusChanges.subscribe(updateErrors); });
+        submittables.forEach(function (s) { return s.inputStatusChange.subscribe(updateErrors); });
         updateErrors();
     };
     InputErrorsComponent.prototype.errorMessage = function (control, key, value) {
@@ -118,13 +118,13 @@ export var InputErrorsComponent = (function () {
     ], InputErrorsComponent);
     return InputErrorsComponent;
 }());
-function errorMessage(control, value, message) {
+function errorMessage(submittable, value, message) {
     if (message == null) {
         return undefined;
     }
     if (typeof message === "string") {
         return message;
     }
-    return message(value, control);
+    return message(value, submittable);
 }
 //# sourceMappingURL=input-errors.component.js.map

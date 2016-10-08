@@ -37,7 +37,7 @@ export var InputDirective = (function (_super) {
     };
     InputDirective = __decorate([
         Directive({
-            selector: '[inputStatus]',
+            selector: '[inputStatus],[inputGroup]',
             exportAs: "frexInput",
             providers: [
                 {

@@ -1,13 +1,13 @@
-import {Directive, Host, OnInit, OnDestroy, EventEmitter, Optional} from "@angular/core";
+import {Directive, Host, OnInit, OnDestroy, EventEmitter} from "@angular/core";
 import {NgControl, AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
-import {Submittable, SubmitGroup, RegistryHandle, SubmitService, InputService, SubmittableControl} from "./model";
-import {InputStatus, InputErrors, InputReady, InputNotReady} from "./input-status";
+import {Submittable, SubmitGroup, RegistryHandle, SubmitService} from "./model";
+import {InputStatus, InputErrors, InputReady, InputNotReady, InputStatusControl} from "./input-status";
 
 @Directive({
     selector: '[ngModel],[formControl],[formControlName]'
 })
-export class InputControlDirective extends SubmittableControl implements OnInit, OnDestroy {
+export class InputControlDirective extends Submittable implements OnInit, OnDestroy {
 
     readonly inputStatusChange = new EventEmitter<InputStatus>();
     private _inputStatus = InputReady;
@@ -16,8 +16,7 @@ export class InputControlDirective extends SubmittableControl implements OnInit,
     private _stateSubscr?: Subscription;
 
     constructor(
-        @Optional() private _inputService: InputService,
-        private _submitGroup: SubmitGroup<Submittable>,
+        private _submitGroup: SubmitGroup,
         private _submitService: SubmitService,
         @Host() private _control: NgControl) {
         super();
@@ -33,8 +32,9 @@ export class InputControlDirective extends SubmittableControl implements OnInit,
 
     updateInputStatus({emitEvents = true}: {emitEvents?: boolean} = {}): InputStatus {
 
-        let status = this.inputReadiness();
+        let status = new InputStatusControl(this.control);
 
+        status = this.addReadiness(status);
         status = this.addErrors(status);
 
         if (!status.equals(this._inputStatus)) {
@@ -47,11 +47,11 @@ export class InputControlDirective extends SubmittableControl implements OnInit,
         return status;
     }
 
-    private inputReadiness() {
+    private addReadiness(status: InputStatus) {
 
         const ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
 
-        return ready ? InputReady : InputNotReady;
+        return status.merge(ready ? InputReady : InputNotReady);
     }
 
     private addErrors(status: InputStatus) {
@@ -69,8 +69,7 @@ export class InputControlDirective extends SubmittableControl implements OnInit,
         this._preSubmitSubscr = this._submitService.preSubmit.subscribe(() => this.updateInputStatus());
         this._stateSubscr = this.control.statusChanges.subscribe(() => this.updateInputStatus());
         this.updateInputStatus({emitEvents: false});
-        this._regHandle =
-            this._inputService ? this._inputService.addSubmittable(this) : this._submitGroup.addSubmittable(this);
+        this._regHandle = this._submitGroup.addSubmittable(this);
     }
 
     ngOnDestroy() {

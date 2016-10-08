@@ -3,7 +3,7 @@ import {Subscription} from "rxjs";
 import {RegistryHandle, InputService, SubmitService, SubmitGroup} from "./model";
 
 @Directive({
-    selector: '[inputStatus]',
+    selector: '[inputStatus],[inputGroup]',
     exportAs: "frexInput",
     providers: [
         {

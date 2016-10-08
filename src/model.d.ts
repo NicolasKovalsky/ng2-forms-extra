@@ -23,29 +23,29 @@ export declare class Registry<T> {
     readonly list: T[];
     add(item: T, handle?: RegistryHandle | (() => void)): RegistryHandle;
 }
-export declare abstract class SubmitGroup<S extends Submittable> extends Submittable {
+export declare abstract class SubmitGroup extends Submittable {
     readonly inputStatusChange: EventEmitter<InputStatus>;
     private _registry;
     private _inputStatus;
     constructor();
     readonly inputStatus: InputStatus;
-    readonly submittableChanges: EventEmitter<S[]>;
-    readonly submittables: S[];
+    readonly submittableChanges: EventEmitter<Submittable[]>;
+    readonly submittables: Submittable[];
     updateInputStatus({emitEvents}?: {
         emitEvents?: boolean;
     }): InputStatus;
     protected setInputStatus(status: InputStatus, {emitEvents}?: {
         emitEvents?: boolean;
     }): void;
-    addSubmittable(submittable: S): RegistryHandle;
-    protected registerSubmittable(_submittable: S): RegistryHandle;
+    addSubmittable(submittable: Submittable): RegistryHandle;
+    protected registerSubmittable(_submittable: Submittable): RegistryHandle;
 }
 export declare abstract class SubmittableControl extends Submittable {
     readonly abstract control: AbstractControl;
 }
-export declare abstract class InputService extends SubmitGroup<SubmittableControl> {
+export declare abstract class InputService extends SubmitGroup {
 }
-export declare abstract class SubmitService extends SubmitGroup<Submittable> {
+export declare abstract class SubmitService extends SubmitGroup {
     readonly abstract preSubmit: EventEmitter<any>;
     readonly abstract submitReady: EventEmitter<any>;
     protected _submitted: boolean;

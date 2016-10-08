@@ -43,6 +43,14 @@ var InputStatus = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(InputStatus.prototype, "control", {
+        get: function () {
+            var statusControl = this.get(inputStatusControlId);
+            return statusControl && statusControl.control;
+        },
+        enumerable: true,
+        configurable: true
+    });
     InputStatus.prototype.get = function (id) {
         return id === this.id ? this : undefined;
     };
@@ -111,6 +119,9 @@ var CombinedInputStatus = (function (_super) {
         configurable: true
     });
     CombinedInputStatus.prototype.add = function (status) {
+        if (status.impliedBy(this)) {
+            return this;
+        }
         this._list = undefined;
         if (status.id !== this.id) {
             var prev = this._map[status.id];
@@ -118,7 +129,10 @@ var CombinedInputStatus = (function (_super) {
                 this._map[status.id] = status;
             }
             else {
-                this._map[status.id] = prev.mergeValues(status);
+                var merged = prev.mergeValues(status);
+                if (!merged.impliedBy(this)) {
+                    this._map[status.id] = merged;
+                }
             }
         }
         for (var _i = 0, _a = status.nested; _i < _a.length; _i++) {
@@ -185,6 +199,35 @@ var InputReadiness = (function (_super) {
 }(InputStatus));
 var InputReady = new InputReadiness(true);
 var InputNotReady = new InputReadiness(false);
+var inputStatusControlId = "__control__";
+var InputStatusControl = (function (_super) {
+    __extends$2(InputStatusControl, _super);
+    function InputStatusControl(_control) {
+        _super.call(this, inputStatusControlId);
+        this._control = _control;
+    }
+    Object.defineProperty(InputStatusControl.prototype, "control", {
+        get: function () {
+            return this._control;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    InputStatusControl.prototype.impliedBy = function (status) {
+        return !this.control || this.control === status.control;
+    };
+    InputStatusControl.prototype.equalValues = function (status) {
+        return this.control === status.control;
+    };
+    InputStatusControl.prototype.mergeValues = function (status) {
+        if (this.control === status.control) {
+            return this;
+        }
+        return noInputStatusControl;
+    };
+    return InputStatusControl;
+}(InputStatus));
+var noInputStatusControl = new InputStatusControl(undefined);
 var inputErrorsId = "__errors__";
 var InputErrors = (function (_super) {
     __extends$2(InputErrors, _super);
@@ -650,7 +693,7 @@ var InputDirective = (function (_super) {
     };
     InputDirective = __decorate$4([
         _angular_core.Directive({
-            selector: '[inputStatus]',
+            selector: '[inputStatus],[inputGroup]',
             exportAs: "frexInput",
             providers: [
                 {
@@ -687,9 +730,8 @@ var __param = (undefined && undefined.__param) || function (paramIndex, decorato
 };
 var InputControlDirective = (function (_super) {
     __extends$4(InputControlDirective, _super);
-    function InputControlDirective(_inputService, _submitGroup, _submitService, _control) {
+    function InputControlDirective(_submitGroup, _submitService, _control) {
         _super.call(this);
-        this._inputService = _inputService;
         this._submitGroup = _submitGroup;
         this._submitService = _submitService;
         this._control = _control;
@@ -712,7 +754,8 @@ var InputControlDirective = (function (_super) {
     });
     InputControlDirective.prototype.updateInputStatus = function (_a) {
         var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        var status = this.inputReadiness();
+        var status = new InputStatusControl(this.control);
+        status = this.addReadiness(status);
         status = this.addErrors(status);
         if (!status.equals(this._inputStatus)) {
             this._inputStatus = status;
@@ -722,9 +765,9 @@ var InputControlDirective = (function (_super) {
         }
         return status;
     };
-    InputControlDirective.prototype.inputReadiness = function () {
+    InputControlDirective.prototype.addReadiness = function (status) {
         var ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
-        return ready ? InputReady : InputNotReady;
+        return status.merge(ready ? InputReady : InputNotReady);
     };
     InputControlDirective.prototype.addErrors = function (status) {
         var errors = this.control.errors;
@@ -738,8 +781,7 @@ var InputControlDirective = (function (_super) {
         this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
         this._stateSubscr = this.control.statusChanges.subscribe(function () { return _this.updateInputStatus(); });
         this.updateInputStatus({ emitEvents: false });
-        this._regHandle =
-            this._inputService ? this._inputService.addSubmittable(this) : this._submitGroup.addSubmittable(this);
+        this._regHandle = this._submitGroup.addSubmittable(this);
     };
     InputControlDirective.prototype.ngOnDestroy = function () {
         if (this._regHandle) {
@@ -759,12 +801,11 @@ var InputControlDirective = (function (_super) {
         _angular_core.Directive({
             selector: '[ngModel],[formControl],[formControlName]'
         }),
-        __param(0, _angular_core.Optional()),
-        __param(3, _angular_core.Host()), 
-        __metadata$5('design:paramtypes', [InputService, SubmitGroup, SubmitService, _angular_forms.NgControl])
+        __param(2, _angular_core.Host()), 
+        __metadata$5('design:paramtypes', [SubmitGroup, SubmitService, _angular_forms.NgControl])
     ], InputControlDirective);
     return InputControlDirective;
-}(SubmittableControl));
+}(Submittable));
 
 var __decorate$6 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -816,8 +857,8 @@ var InputErrorsComponent = (function () {
     });
     InputErrorsComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._subscription = this._inputService.submittableChanges.subscribe(function (controls) { return _this.updateInputs(controls); });
-        this.updateInputs(this._inputService.submittables);
+        this._subscription = this._inputService.submittableChanges.subscribe(function (submittables) { return _this.updateSubmittables(submittables); });
+        this.updateSubmittables(this._inputService.submittables);
     };
     InputErrorsComponent.prototype.ngOnDestroy = function () {
         if (this._subscription) {
@@ -828,11 +869,11 @@ var InputErrorsComponent = (function () {
     InputErrorsComponent.prototype.trackError = function (error) {
         return error.key;
     };
-    InputErrorsComponent.prototype.updateInputs = function (controls) {
+    InputErrorsComponent.prototype.updateSubmittables = function (submittables) {
         var _this = this;
         var updateErrors = function () { return resolved$1.then(function () {
             _this._errors.splice(0);
-            controls.forEach(function (submittable) {
+            submittables.forEach(function (submittable) {
                 var errors = submittable.inputStatus.errors;
                 if (errors) {
                     for (var key in errors) {
@@ -846,7 +887,7 @@ var InputErrorsComponent = (function () {
                 }
             });
         }); };
-        controls.forEach(function (s) { return s.control.statusChanges.subscribe(updateErrors); });
+        submittables.forEach(function (s) { return s.inputStatusChange.subscribe(updateErrors); });
         updateErrors();
     };
     InputErrorsComponent.prototype.errorMessage = function (control, key, value) {
@@ -884,14 +925,14 @@ var InputErrorsComponent = (function () {
     ], InputErrorsComponent);
     return InputErrorsComponent;
 }());
-function errorMessage(control, value, message) {
+function errorMessage(submittable, value, message) {
     if (message == null) {
         return undefined;
     }
     if (typeof message === "string") {
         return message;
     }
-    return message(value, control);
+    return message(value, submittable);
 }
 
 var __decorate$7 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
@@ -977,6 +1018,7 @@ exports.InputErrorsComponent = InputErrorsComponent;
 exports.InputStatus = InputStatus;
 exports.InputReady = InputReady;
 exports.InputNotReady = InputNotReady;
+exports.InputStatusControl = InputStatusControl;
 exports.InputErrors = InputErrors;
 exports.InputStatusDirective = InputStatusDirective;
 exports.Submittable = Submittable;
