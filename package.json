@@ -1,6 +1,6 @@
 {
   "name": "ng2-forms-extra",
-  "version": "0.2.0-dev",
+  "version": "0.2.1-dev",
   "description": "Angular2 Forms Extensions",
   "keywords": [
     "angular2",
@@ -12,7 +12,7 @@
   "homepage": "https://github.com/surol/ng2-forms-extra",
   "repository": {
     "type": "git",
-    "url": "git@github.com:surol/ng2-rike.git"
+    "url": "git@github.com:surol/ng2-forms-extra.git"
   },
   "main": "bundles/ng2-forms-extra.umd.js",
   "module": "index.js",
