@@ -12,7 +12,7 @@
   "homepage": "https://github.com/surol/ng2-forms-extra",
   "repository": {
     "type": "git",
-    "url": "git@github.com:surol/ng2-rike.git"
+    "url": "git@github.com:surol/ng2-forms-extra.git"
   },
   "main": "bundles/ng2-forms-extra.umd.js",
   "module": "index.js",
