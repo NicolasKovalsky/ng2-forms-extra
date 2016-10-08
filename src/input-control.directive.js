@@ -18,7 +18,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 import { Directive, Host, EventEmitter } from "@angular/core";
 import { NgControl } from "@angular/forms";
 import { Submittable, SubmitGroup, SubmitService } from "./model";
-import { InputErrors, InputReady, InputNotReady, InputStatusControl } from "./input-status";
+import { InputReady, InputNotReady, inputErrors } from "./input-status";
+import { inputStatusControl } from "./input-status";
 export var InputControlDirective = (function (_super) {
     __extends(InputControlDirective, _super);
     function InputControlDirective(_submitGroup, _submitService, _control) {
@@ -45,7 +46,7 @@ export var InputControlDirective = (function (_super) {
     });
     InputControlDirective.prototype.updateInputStatus = function (_a) {
         var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        var status = new InputStatusControl(this.control);
+        var status = inputStatusControl(this.control);
         status = this.addReadiness(status);
         status = this.addErrors(status);
         if (!status.equals(this._inputStatus)) {
@@ -63,7 +64,7 @@ export var InputControlDirective = (function (_super) {
     InputControlDirective.prototype.addErrors = function (status) {
         var errors = this.control.errors;
         if (errors) {
-            return status.merge(new InputErrors(errors));
+            return status.merge(inputErrors(errors));
         }
         return status;
     };

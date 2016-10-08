@@ -1,5 +1,5 @@
 import { OnDestroy, OnInit } from "@angular/core";
-import { InputService, Submittable } from "./model";
+import { Submittable, SubmitGroup } from "./model";
 export interface InputErrorMap {
     [key: string]: string | ((error: any, submittable: Submittable) => string);
 }
@@ -8,11 +8,11 @@ export interface InputError {
     message: string;
 }
 export declare class InputErrorsComponent implements OnInit, OnDestroy {
-    private _inputService;
+    private _submitGroup;
     private _subscription?;
     private _errors;
     private inputErrorsMap;
-    constructor(_inputService: InputService);
+    constructor(_submitGroup: SubmitGroup);
     readonly hasErrors: boolean;
     readonly errors: InputError[];
     ngOnInit(): void;

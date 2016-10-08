@@ -2,7 +2,8 @@ import {Directive, Host, OnInit, OnDestroy, EventEmitter} from "@angular/core";
 import {NgControl, AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {Submittable, SubmitGroup, RegistryHandle, SubmitService} from "./model";
-import {InputStatus, InputErrors, InputReady, InputNotReady, InputStatusControl} from "./input-status";
+import {InputStatus, InputReady, InputNotReady, inputErrors} from "./input-status";
+import {inputStatusControl} from "./input-status";
 
 @Directive({
     selector: '[ngModel],[formControl],[formControlName]'
@@ -32,7 +33,7 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
 
     updateInputStatus({emitEvents = true}: {emitEvents?: boolean} = {}): InputStatus {
 
-        let status = new InputStatusControl(this.control);
+        let status = inputStatusControl(this.control);
 
         status = this.addReadiness(status);
         status = this.addErrors(status);
@@ -59,7 +60,7 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
         const errors = this.control.errors;
 
         if (errors) {
-            return status.merge(new InputErrors(errors));
+            return status.merge(inputErrors(errors));
         }
 
         return status;

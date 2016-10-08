@@ -1,6 +1,6 @@
 import {Component, Input, OnDestroy, Optional, OnInit} from "@angular/core";
 import {Subscription} from "rxjs";
-import {InputService, Submittable} from "./model";
+import {Submittable, SubmitGroup} from "./model";
 
 export interface InputErrorMap {
     [key: string]: string | ((error: any, submittable: Submittable) => string)
@@ -39,7 +39,7 @@ const resolved = Promise.resolve();
     `,
     host: {
         '[class.frex-errors]': 'true',
-        '[class.frex-errors-hidden]': '!hasErrors',
+        '[class.frex-no-errors]': '!hasErrors',
     }
 })
 export class InputErrorsComponent implements OnInit, OnDestroy {
@@ -50,11 +50,11 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
     @Input()
     private inputErrorsMap: InputErrorMap = {};
 
-    constructor(@Optional() private _inputService: InputService) {
+    constructor(@Optional() private _submitGroup: SubmitGroup) {
     }
 
     get hasErrors(): boolean {
-        return !this._inputService.inputStatus.ready && this.errors.length > 0;
+        return !this._submitGroup.inputStatus.ready && this.errors.length > 0;
     }
 
     get errors(): InputError[] {
@@ -62,9 +62,9 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this._subscription = this._inputService.submittableChanges.subscribe(
+        this._subscription = this._submitGroup.submittableChanges.subscribe(
             (submittables: Submittable[]) => this.updateSubmittables(submittables));
-        this.updateSubmittables(this._inputService.submittables);
+        this.updateSubmittables(this._submitGroup.submittables);
     }
 
     ngOnDestroy() {

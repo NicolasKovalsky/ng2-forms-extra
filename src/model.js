@@ -5,10 +5,22 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 import { EventEmitter } from "@angular/core";
 import { InputReady } from "./input-status";
+/**
+ * Submittable interface.
+ *
+ * Submittables (e.g. form inputs) could be submitted at once via {{SubmitService}}.
+ *
+ * Submittable is responsible for its input status indication and updates.
+ */
 export var Submittable = (function () {
     function Submittable() {
     }
     Object.defineProperty(Submittable.prototype, "ready", {
+        /**
+         * Whether this submittable is ready to be submitted.
+         *
+         * @return {boolean} the value of `.inputStatus.ready` field.
+         */
         get: function () {
             return this.inputStatus.ready;
         },
@@ -16,6 +28,11 @@ export var Submittable = (function () {
         configurable: true
     });
     Object.defineProperty(Submittable.prototype, "errors", {
+        /**
+         * An errors associated with this submittable.
+         *
+         * @return {{}|undefined} the value of `.inputStatus.errors` field.
+         */
         get: function () {
             return this.inputStatus.errors;
         },
@@ -24,6 +41,9 @@ export var Submittable = (function () {
     });
     return Submittable;
 }());
+/**
+ * A utility registry implementation.
+ */
 export var Registry = (function () {
     function Registry() {
         this.changes = new EventEmitter();
@@ -65,6 +85,16 @@ export var Registry = (function () {
     return Registry;
 }());
 var resolved = Promise.resolve();
+/**
+ * A group of submittables represented as one submittable.
+ *
+ * The submittables could be added to the group with `addSubmittable()` methods.
+ *
+ * The input status of this group is combined from the added submittables' input statuses with `InputStatus.merge()`
+ * method.
+ *
+ * This is a base class for concrete injectable service implementations. It is also used as a provider token.
+ */
 export var SubmitGroup = (function (_super) {
     __extends(SubmitGroup, _super);
     function SubmitGroup() {
@@ -81,6 +111,11 @@ export var SubmitGroup = (function (_super) {
         configurable: true
     });
     Object.defineProperty(SubmitGroup.prototype, "submittableChanges", {
+        /**
+         * An event emitter reporting on submittable list changes, i.e. submittable additions or removals.
+         *
+         * @return {EventEmitter<Submittable[]>}
+         */
         get: function () {
             return this._registry.changes;
         },
@@ -88,6 +123,11 @@ export var SubmitGroup = (function (_super) {
         configurable: true
     });
     Object.defineProperty(SubmitGroup.prototype, "submittables", {
+        /**
+         * Submittables added to this group.
+         *
+         * @return {Submittable[]} an array of submittables.
+         */
         get: function () {
             return this._registry.list;
         },
@@ -110,6 +150,16 @@ export var SubmitGroup = (function (_super) {
             this.inputStatusChange.emit(status);
         }
     };
+    /**
+     * Adds submittable to this group.
+     *
+     * The addition would be reported by `submittableChanges` event emitter.
+     *
+     * @param submittable a submittable to add.
+     *
+     * @return {RegistryHandle} a handle that can be used to remove the `submittable` from this group. The removal
+     * would be reported by `submittableChanges` event emitter.
+     */
     SubmitGroup.prototype.addSubmittable = function (submittable) {
         var _this = this;
         var subscr;
@@ -134,13 +184,11 @@ export var SubmitGroup = (function (_super) {
     };
     return SubmitGroup;
 }(Submittable));
-export var SubmittableControl = (function (_super) {
-    __extends(SubmittableControl, _super);
-    function SubmittableControl() {
-        _super.apply(this, arguments);
-    }
-    return SubmittableControl;
-}(Submittable));
+/**
+ * Input service.
+ *
+ * An input service is registered by {{InputDirective}} to group one or more input fields.
+ */
 export var InputService = (function (_super) {
     __extends(InputService, _super);
     function InputService() {
@@ -148,6 +196,13 @@ export var InputService = (function (_super) {
     }
     return InputService;
 }(SubmitGroup));
+/**
+ * Submit service.
+ *
+ * A submit service is registered alongside Angular forms by {{SubmitReadyDirective}}. The input fields are added
+ * to this service automatically (either directly, or by {{InputService}}). It can be used to submit such forms when
+ * they are ready.
+ */
 export var SubmitService = (function (_super) {
     __extends(SubmitService, _super);
     function SubmitService() {
@@ -155,12 +210,20 @@ export var SubmitService = (function (_super) {
         this._submitted = false;
     }
     Object.defineProperty(SubmitService.prototype, "submitted", {
+        /**
+         * Whether an attempt to submit this form were performed.
+         *
+         * @return {boolean} `true` if `.submit()` method is called.
+         */
         get: function () {
             return this._submitted;
         },
         enumerable: true,
         configurable: true
     });
+    /**
+     * Resets a submitted flag.
+     */
     SubmitService.prototype.resetSubmitted = function () {
         this._submitted = false;
     };

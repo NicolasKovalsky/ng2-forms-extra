@@ -11,7 +11,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 import { Component, Input, Optional } from "@angular/core";
-import { InputService } from "./model";
+import { SubmitGroup } from "./model";
 var DEFAULT_INPUT_ERRORS_MAP = {
     required: "This field is required",
     minlength: function (error) {
@@ -29,14 +29,14 @@ var DEFAULT_INPUT_ERRORS_MAP = {
 };
 var resolved = Promise.resolve();
 export var InputErrorsComponent = (function () {
-    function InputErrorsComponent(_inputService) {
-        this._inputService = _inputService;
+    function InputErrorsComponent(_submitGroup) {
+        this._submitGroup = _submitGroup;
         this._errors = [];
         this.inputErrorsMap = {};
     }
     Object.defineProperty(InputErrorsComponent.prototype, "hasErrors", {
         get: function () {
-            return !this._inputService.inputStatus.ready && this.errors.length > 0;
+            return !this._submitGroup.inputStatus.ready && this.errors.length > 0;
         },
         enumerable: true,
         configurable: true
@@ -50,8 +50,8 @@ export var InputErrorsComponent = (function () {
     });
     InputErrorsComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._subscription = this._inputService.submittableChanges.subscribe(function (submittables) { return _this.updateSubmittables(submittables); });
-        this.updateSubmittables(this._inputService.submittables);
+        this._subscription = this._submitGroup.submittableChanges.subscribe(function (submittables) { return _this.updateSubmittables(submittables); });
+        this.updateSubmittables(this._submitGroup.submittables);
     };
     InputErrorsComponent.prototype.ngOnDestroy = function () {
         if (this._subscription) {
@@ -110,11 +110,11 @@ export var InputErrorsComponent = (function () {
             template: "\n    <ul class=\"frex-error-list\" *ngIf=\"hasErrors\">\n        <li *ngFor=\"let error of errors; trackBy: trackError\" class=\"frex-error\">{{error.message}}</li>\n    </ul>\n    ",
             host: {
                 '[class.frex-errors]': 'true',
-                '[class.frex-errors-hidden]': '!hasErrors',
+                '[class.frex-no-errors]': '!hasErrors',
             }
         }),
         __param(0, Optional()), 
-        __metadata('design:paramtypes', [InputService])
+        __metadata('design:paramtypes', [SubmitGroup])
     ], InputErrorsComponent);
     return InputErrorsComponent;
 }());

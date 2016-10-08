@@ -9,11 +9,35 @@ var __extends$2 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Input status interface.
+ *
+ * This is a base class for input status implementations. Actual input status can be represented by one or more input
+ * status objects of different types. Input status objects of different types could be distinguished by their
+ * identifiers.
+ *
+ * There are several predefined input status implementations. Their payload is available via methods of the base
+ * class.
+ *
+ * Input status object is meant to be immutable.
+ */
 var InputStatus = (function () {
+    /**
+     * Constructs input status.
+     *
+     * At most one object with the same identifier can exists within input status.
+     *
+     * @param _id a unique identifier of status object type.
+     */
     function InputStatus(_id) {
         this._id = _id;
     }
     Object.defineProperty(InputStatus.prototype, "id", {
+        /**
+         * An identifier of status object type.
+         *
+         * @return {string} the identifier passed to constructor.
+         */
         get: function () {
             return this._id;
         },
@@ -21,6 +45,11 @@ var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "nested", {
+        /**
+         * Nested input status object.
+         *
+         * @return {Array<InputStatus>} a list of nested input status objects.
+         */
         get: function () {
             return [];
         },
@@ -28,6 +57,19 @@ var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "ready", {
+        /**
+         * Whether the input is ready to be submitted.
+         *
+         * If some of the inputs are not ready, the submit would be prevented.
+         *
+         * When input is ready this does not necessarily mean that it is valid. Nevertheless, the validation errors won't be
+         * displayed for ready for submit inputs. This typically means that user didn't entered the invalid data. On attempt
+         * to submit an invalid* input will be marked as non-ready, submit will be prevented, and errors will be displayed.
+         *
+         * This value can be set with `InputReady` and `InputNotReady` constants.
+         *
+         * @return {boolean}
+         */
         get: function () {
             var readiness = this.get(inputReadinessId);
             return readiness == null || readiness.ready;
@@ -36,6 +78,13 @@ var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "errors", {
+        /**
+         * Input errors.
+         *
+         * Input errors could be set with `inputErrors()` method.
+         *
+         * @return {{}|undefined} a map of input errors, if any.
+         */
         get: function () {
             var errors = this.get(inputErrorsId);
             return errors && errors.errors;
@@ -44,6 +93,15 @@ var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "control", {
+        /**
+         * A control, which status is represented by this status.
+         *
+         * The control can be set with `inputStatusControl()` method.
+         *
+         * Note that when the status is merged from multiple controls, this value will be undefined.
+         *
+         * @return {AbstractControl|undefined} a control instance, if eny.
+         */
         get: function () {
             var statusControl = this.get(inputStatusControlId);
             return statusControl && statusControl.control;
@@ -51,9 +109,21 @@ var InputStatus = (function () {
         enumerable: true,
         configurable: true
     });
+    /**
+     * An input status object with the given identifier.
+     *
+     * @param id target identifier.
+     *
+     * @return {InputStatus} input status which identifier is equal to the given one, if any.
+     */
     InputStatus.prototype.get = function (id) {
         return id === this.id ? this : undefined;
     };
+    /**
+     * Checks whether this input status is equal to another one.
+     *
+     * @param status an input status object to compare this one with. If omitted the method will return `false`.
+     */
     InputStatus.prototype.equals = function (status) {
         if (!status) {
             return false;
@@ -71,9 +141,23 @@ var InputStatus = (function () {
         }
         return this.combine().equalValues(status.combine());
     };
+    /**
+     * Checks whether this input status is implied by another one.
+     *
+     * This method is called to remove unnecessary input statuses from combined ones.
+     *
+     * @param status another input status to check this one against.
+     */
     InputStatus.prototype.impliedBy = function (status) {
         return status === this;
     };
+    /**
+     * Merges two input statuses.
+     *
+     * @param status an input status to merge this one with.
+     *
+     * @return {InputStatus} new input status combined from the two ones.
+     */
     InputStatus.prototype.merge = function (status) {
         if (status.impliedBy(this)) {
             return this;
@@ -197,8 +281,27 @@ var InputReadiness = (function (_super) {
     };
     return InputReadiness;
 }(InputStatus));
+/**
+ * Ready for submit input status.
+ */
 var InputReady = new InputReadiness(true);
+/**
+ * Not ready for submit input status.
+ */
 var InputNotReady = new InputReadiness(false);
+/**
+ * Constructs input status control.
+ *
+ * The control instance will be available via `InputStatus.control` field.
+ *
+ * When merged with another input status the control value would be preserved, unless another input status represents
+ * another control. In the latter case the control status would be dropped from merged status.
+ *
+ * @param control a control which status should be represented.
+ */
+function inputStatusControl(control) {
+    return new InputStatusControl(control);
+}
 var inputStatusControlId = "__control__";
 var InputStatusControl = (function (_super) {
     __extends$2(InputStatusControl, _super);
@@ -217,17 +320,30 @@ var InputStatusControl = (function (_super) {
         return !this.control || this.control === status.control;
     };
     InputStatusControl.prototype.equalValues = function (status) {
-        return this.control === status.control;
+        return this._control === status._control;
     };
     InputStatusControl.prototype.mergeValues = function (status) {
-        if (this.control === status.control) {
+        if (!status._control || this._control === status._control) {
             return this;
+        }
+        if (!this._control) {
+            return status;
         }
         return noInputStatusControl;
     };
     return InputStatusControl;
 }(InputStatus));
 var noInputStatusControl = new InputStatusControl(undefined);
+/**
+ * Constructs input errors.
+ *
+ * The `errors` map will be available via `InputStatus.errors` field.
+ *
+ * @param errors a error map.
+ */
+function inputErrors(errors) {
+    return new InputErrors(errors);
+}
 var inputErrorsId = "__errors__";
 var InputErrors = (function (_super) {
     __extends$2(InputErrors, _super);
@@ -293,10 +409,22 @@ var __extends$1 = (undefined && undefined.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Submittable interface.
+ *
+ * Submittables (e.g. form inputs) could be submitted at once via {{SubmitService}}.
+ *
+ * Submittable is responsible for its input status indication and updates.
+ */
 var Submittable = (function () {
     function Submittable() {
     }
     Object.defineProperty(Submittable.prototype, "ready", {
+        /**
+         * Whether this submittable is ready to be submitted.
+         *
+         * @return {boolean} the value of `.inputStatus.ready` field.
+         */
         get: function () {
             return this.inputStatus.ready;
         },
@@ -304,6 +432,11 @@ var Submittable = (function () {
         configurable: true
     });
     Object.defineProperty(Submittable.prototype, "errors", {
+        /**
+         * An errors associated with this submittable.
+         *
+         * @return {{}|undefined} the value of `.inputStatus.errors` field.
+         */
         get: function () {
             return this.inputStatus.errors;
         },
@@ -312,6 +445,9 @@ var Submittable = (function () {
     });
     return Submittable;
 }());
+/**
+ * A utility registry implementation.
+ */
 var Registry = (function () {
     function Registry() {
         this.changes = new _angular_core.EventEmitter();
@@ -353,6 +489,16 @@ var Registry = (function () {
     return Registry;
 }());
 var resolved = Promise.resolve();
+/**
+ * A group of submittables represented as one submittable.
+ *
+ * The submittables could be added to the group with `addSubmittable()` methods.
+ *
+ * The input status of this group is combined from the added submittables' input statuses with `InputStatus.merge()`
+ * method.
+ *
+ * This is a base class for concrete injectable service implementations. It is also used as a provider token.
+ */
 var SubmitGroup = (function (_super) {
     __extends$1(SubmitGroup, _super);
     function SubmitGroup() {
@@ -369,6 +515,11 @@ var SubmitGroup = (function (_super) {
         configurable: true
     });
     Object.defineProperty(SubmitGroup.prototype, "submittableChanges", {
+        /**
+         * An event emitter reporting on submittable list changes, i.e. submittable additions or removals.
+         *
+         * @return {EventEmitter<Submittable[]>}
+         */
         get: function () {
             return this._registry.changes;
         },
@@ -376,6 +527,11 @@ var SubmitGroup = (function (_super) {
         configurable: true
     });
     Object.defineProperty(SubmitGroup.prototype, "submittables", {
+        /**
+         * Submittables added to this group.
+         *
+         * @return {Submittable[]} an array of submittables.
+         */
         get: function () {
             return this._registry.list;
         },
@@ -398,6 +554,16 @@ var SubmitGroup = (function (_super) {
             this.inputStatusChange.emit(status);
         }
     };
+    /**
+     * Adds submittable to this group.
+     *
+     * The addition would be reported by `submittableChanges` event emitter.
+     *
+     * @param submittable a submittable to add.
+     *
+     * @return {RegistryHandle} a handle that can be used to remove the `submittable` from this group. The removal
+     * would be reported by `submittableChanges` event emitter.
+     */
     SubmitGroup.prototype.addSubmittable = function (submittable) {
         var _this = this;
         var subscr;
@@ -422,13 +588,11 @@ var SubmitGroup = (function (_super) {
     };
     return SubmitGroup;
 }(Submittable));
-var SubmittableControl = (function (_super) {
-    __extends$1(SubmittableControl, _super);
-    function SubmittableControl() {
-        _super.apply(this, arguments);
-    }
-    return SubmittableControl;
-}(Submittable));
+/**
+ * Input service.
+ *
+ * An input service is registered by {{InputDirective}} to group one or more input fields.
+ */
 var InputService = (function (_super) {
     __extends$1(InputService, _super);
     function InputService() {
@@ -436,6 +600,13 @@ var InputService = (function (_super) {
     }
     return InputService;
 }(SubmitGroup));
+/**
+ * Submit service.
+ *
+ * A submit service is registered alongside Angular forms by {{SubmitReadyDirective}}. The input fields are added
+ * to this service automatically (either directly, or by {{InputService}}). It can be used to submit such forms when
+ * they are ready.
+ */
 var SubmitService = (function (_super) {
     __extends$1(SubmitService, _super);
     function SubmitService() {
@@ -443,12 +614,20 @@ var SubmitService = (function (_super) {
         this._submitted = false;
     }
     Object.defineProperty(SubmitService.prototype, "submitted", {
+        /**
+         * Whether an attempt to submit this form were performed.
+         *
+         * @return {boolean} `true` if `.submit()` method is called.
+         */
         get: function () {
             return this._submitted;
         },
         enumerable: true,
         configurable: true
     });
+    /**
+     * Resets a submitted flag.
+     */
     SubmitService.prototype.resetSubmitted = function () {
         this._submitted = false;
     };
@@ -754,7 +933,7 @@ var InputControlDirective = (function (_super) {
     });
     InputControlDirective.prototype.updateInputStatus = function (_a) {
         var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        var status = new InputStatusControl(this.control);
+        var status = inputStatusControl(this.control);
         status = this.addReadiness(status);
         status = this.addErrors(status);
         if (!status.equals(this._inputStatus)) {
@@ -772,7 +951,7 @@ var InputControlDirective = (function (_super) {
     InputControlDirective.prototype.addErrors = function (status) {
         var errors = this.control.errors;
         if (errors) {
-            return status.merge(new InputErrors(errors));
+            return status.merge(inputErrors(errors));
         }
         return status;
     };
@@ -836,14 +1015,14 @@ var DEFAULT_INPUT_ERRORS_MAP = {
 };
 var resolved$1 = Promise.resolve();
 var InputErrorsComponent = (function () {
-    function InputErrorsComponent(_inputService) {
-        this._inputService = _inputService;
+    function InputErrorsComponent(_submitGroup) {
+        this._submitGroup = _submitGroup;
         this._errors = [];
         this.inputErrorsMap = {};
     }
     Object.defineProperty(InputErrorsComponent.prototype, "hasErrors", {
         get: function () {
-            return !this._inputService.inputStatus.ready && this.errors.length > 0;
+            return !this._submitGroup.inputStatus.ready && this.errors.length > 0;
         },
         enumerable: true,
         configurable: true
@@ -857,8 +1036,8 @@ var InputErrorsComponent = (function () {
     });
     InputErrorsComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._subscription = this._inputService.submittableChanges.subscribe(function (submittables) { return _this.updateSubmittables(submittables); });
-        this.updateSubmittables(this._inputService.submittables);
+        this._subscription = this._submitGroup.submittableChanges.subscribe(function (submittables) { return _this.updateSubmittables(submittables); });
+        this.updateSubmittables(this._submitGroup.submittables);
     };
     InputErrorsComponent.prototype.ngOnDestroy = function () {
         if (this._subscription) {
@@ -917,11 +1096,11 @@ var InputErrorsComponent = (function () {
             template: "\n    <ul class=\"frex-error-list\" *ngIf=\"hasErrors\">\n        <li *ngFor=\"let error of errors; trackBy: trackError\" class=\"frex-error\">{{error.message}}</li>\n    </ul>\n    ",
             host: {
                 '[class.frex-errors]': 'true',
-                '[class.frex-errors-hidden]': '!hasErrors',
+                '[class.frex-no-errors]': '!hasErrors',
             }
         }),
         __param$1(0, _angular_core.Optional()), 
-        __metadata$6('design:paramtypes', [InputService])
+        __metadata$6('design:paramtypes', [SubmitGroup])
     ], InputErrorsComponent);
     return InputErrorsComponent;
 }());
@@ -1018,13 +1197,12 @@ exports.InputErrorsComponent = InputErrorsComponent;
 exports.InputStatus = InputStatus;
 exports.InputReady = InputReady;
 exports.InputNotReady = InputNotReady;
-exports.InputStatusControl = InputStatusControl;
-exports.InputErrors = InputErrors;
+exports.inputStatusControl = inputStatusControl;
+exports.inputErrors = inputErrors;
 exports.InputStatusDirective = InputStatusDirective;
 exports.Submittable = Submittable;
 exports.Registry = Registry;
 exports.SubmitGroup = SubmitGroup;
-exports.SubmittableControl = SubmittableControl;
 exports.InputService = InputService;
 exports.SubmitService = SubmitService;
 exports.NonBlankDirective = NonBlankDirective;

@@ -3,11 +3,35 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Input status interface.
+ *
+ * This is a base class for input status implementations. Actual input status can be represented by one or more input
+ * status objects of different types. Input status objects of different types could be distinguished by their
+ * identifiers.
+ *
+ * There are several predefined input status implementations. Their payload is available via methods of the base
+ * class.
+ *
+ * Input status object is meant to be immutable.
+ */
 export var InputStatus = (function () {
+    /**
+     * Constructs input status.
+     *
+     * At most one object with the same identifier can exists within input status.
+     *
+     * @param _id a unique identifier of status object type.
+     */
     function InputStatus(_id) {
         this._id = _id;
     }
     Object.defineProperty(InputStatus.prototype, "id", {
+        /**
+         * An identifier of status object type.
+         *
+         * @return {string} the identifier passed to constructor.
+         */
         get: function () {
             return this._id;
         },
@@ -15,6 +39,11 @@ export var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "nested", {
+        /**
+         * Nested input status object.
+         *
+         * @return {Array<InputStatus>} a list of nested input status objects.
+         */
         get: function () {
             return [];
         },
@@ -22,6 +51,19 @@ export var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "ready", {
+        /**
+         * Whether the input is ready to be submitted.
+         *
+         * If some of the inputs are not ready, the submit would be prevented.
+         *
+         * When input is ready this does not necessarily mean that it is valid. Nevertheless, the validation errors won't be
+         * displayed for ready for submit inputs. This typically means that user didn't entered the invalid data. On attempt
+         * to submit an invalid* input will be marked as non-ready, submit will be prevented, and errors will be displayed.
+         *
+         * This value can be set with `InputReady` and `InputNotReady` constants.
+         *
+         * @return {boolean}
+         */
         get: function () {
             var readiness = this.get(inputReadinessId);
             return readiness == null || readiness.ready;
@@ -30,6 +72,13 @@ export var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "errors", {
+        /**
+         * Input errors.
+         *
+         * Input errors could be set with `inputErrors()` method.
+         *
+         * @return {{}|undefined} a map of input errors, if any.
+         */
         get: function () {
             var errors = this.get(inputErrorsId);
             return errors && errors.errors;
@@ -38,6 +87,15 @@ export var InputStatus = (function () {
         configurable: true
     });
     Object.defineProperty(InputStatus.prototype, "control", {
+        /**
+         * A control, which status is represented by this status.
+         *
+         * The control can be set with `inputStatusControl()` method.
+         *
+         * Note that when the status is merged from multiple controls, this value will be undefined.
+         *
+         * @return {AbstractControl|undefined} a control instance, if eny.
+         */
         get: function () {
             var statusControl = this.get(inputStatusControlId);
             return statusControl && statusControl.control;
@@ -45,9 +103,21 @@ export var InputStatus = (function () {
         enumerable: true,
         configurable: true
     });
+    /**
+     * An input status object with the given identifier.
+     *
+     * @param id target identifier.
+     *
+     * @return {InputStatus} input status which identifier is equal to the given one, if any.
+     */
     InputStatus.prototype.get = function (id) {
         return id === this.id ? this : undefined;
     };
+    /**
+     * Checks whether this input status is equal to another one.
+     *
+     * @param status an input status object to compare this one with. If omitted the method will return `false`.
+     */
     InputStatus.prototype.equals = function (status) {
         if (!status) {
             return false;
@@ -65,9 +135,23 @@ export var InputStatus = (function () {
         }
         return this.combine().equalValues(status.combine());
     };
+    /**
+     * Checks whether this input status is implied by another one.
+     *
+     * This method is called to remove unnecessary input statuses from combined ones.
+     *
+     * @param status another input status to check this one against.
+     */
     InputStatus.prototype.impliedBy = function (status) {
         return status === this;
     };
+    /**
+     * Merges two input statuses.
+     *
+     * @param status an input status to merge this one with.
+     *
+     * @return {InputStatus} new input status combined from the two ones.
+     */
     InputStatus.prototype.merge = function (status) {
         if (status.impliedBy(this)) {
             return this;
@@ -191,10 +275,29 @@ var InputReadiness = (function (_super) {
     };
     return InputReadiness;
 }(InputStatus));
+/**
+ * Ready for submit input status.
+ */
 export var InputReady = new InputReadiness(true);
+/**
+ * Not ready for submit input status.
+ */
 export var InputNotReady = new InputReadiness(false);
+/**
+ * Constructs input status control.
+ *
+ * The control instance will be available via `InputStatus.control` field.
+ *
+ * When merged with another input status the control value would be preserved, unless another input status represents
+ * another control. In the latter case the control status would be dropped from merged status.
+ *
+ * @param control a control which status should be represented.
+ */
+export function inputStatusControl(control) {
+    return new InputStatusControl(control);
+}
 var inputStatusControlId = "__control__";
-export var InputStatusControl = (function (_super) {
+var InputStatusControl = (function (_super) {
     __extends(InputStatusControl, _super);
     function InputStatusControl(_control) {
         _super.call(this, inputStatusControlId);
@@ -211,19 +314,32 @@ export var InputStatusControl = (function (_super) {
         return !this.control || this.control === status.control;
     };
     InputStatusControl.prototype.equalValues = function (status) {
-        return this.control === status.control;
+        return this._control === status._control;
     };
     InputStatusControl.prototype.mergeValues = function (status) {
-        if (this.control === status.control) {
+        if (!status._control || this._control === status._control) {
             return this;
+        }
+        if (!this._control) {
+            return status;
         }
         return noInputStatusControl;
     };
     return InputStatusControl;
 }(InputStatus));
 var noInputStatusControl = new InputStatusControl(undefined);
+/**
+ * Constructs input errors.
+ *
+ * The `errors` map will be available via `InputStatus.errors` field.
+ *
+ * @param errors a error map.
+ */
+export function inputErrors(errors) {
+    return new InputErrors(errors);
+}
 var inputErrorsId = "__errors__";
-export var InputErrors = (function (_super) {
+var InputErrors = (function (_super) {
     __extends(InputErrors, _super);
     function InputErrors(_errors) {
         _super.call(this, inputErrorsId);

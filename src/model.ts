@@ -3,30 +3,71 @@ import {AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {InputStatus, InputReady} from "./input-status";
 
+/**
+ * Submittable interface.
+ *
+ * Submittables (e.g. form inputs) could be submitted at once via {{SubmitService}}.
+ *
+ * Submittable is responsible for its input status indication and updates.
+ */
 export abstract class Submittable {
 
+    /**
+     * Current input status of this submittable.
+     */
     abstract readonly inputStatus: InputStatus;
 
+    /**
+     * Input status changes event emitter.
+     */
     abstract readonly inputStatusChange: EventEmitter<InputStatus>;
 
+    /**
+     * Whether this submittable is ready to be submitted.
+     *
+     * @return {boolean} the value of `.inputStatus.ready` field.
+     */
     get ready(): boolean {
         return this.inputStatus.ready;
     }
 
+    /**
+     * An errors associated with this submittable.
+     *
+     * @return {{}|undefined} the value of `.inputStatus.errors` field.
+     */
     get errors(): {[key: string]: any} | undefined {
         return this.inputStatus.errors;
     }
 
-    abstract updateInputStatus(opts?: {emitEvents?: boolean}): InputStatus;
+    /**
+     * Updates input status.
+     *
+     * @param emitEvents whether to emit input status change events. `true` by default.
+     */
+    abstract updateInputStatus({emitEvents}?: {emitEvents?: boolean}): InputStatus;
 
 }
 
+/**
+ * A registry handle, that can be used to unregister previously registered entity.
+ *
+ * An instance of this class is typically returned form registration methods and can be used to revert their effect.
+ */
 export interface RegistryHandle {
 
+    /**
+     * Unregisters the entity that were registered by the method call returned this handle instance.
+     *
+     * Subsequent calls to this method won't have any effect.
+     */
     unregister(): void;
 
 }
 
+/**
+ * A utility registry implementation.
+ */
 export class Registry<T> {
 
     readonly changes = new EventEmitter<T[]>();
@@ -74,6 +115,16 @@ export class Registry<T> {
 
 const resolved = Promise.resolve();
 
+/**
+ * A group of submittables represented as one submittable.
+ *
+ * The submittables could be added to the group with `addSubmittable()` methods.
+ *
+ * The input status of this group is combined from the added submittables' input statuses with `InputStatus.merge()`
+ * method.
+ *
+ * This is a base class for concrete injectable service implementations. It is also used as a provider token.
+ */
 export abstract class SubmitGroup extends Submittable {
 
     readonly inputStatusChange = new EventEmitter<InputStatus>();
@@ -88,10 +139,20 @@ export abstract class SubmitGroup extends Submittable {
         return this._inputStatus;
     }
 
+    /**
+     * An event emitter reporting on submittable list changes, i.e. submittable additions or removals.
+     *
+     * @return {EventEmitter<Submittable[]>}
+     */
     get submittableChanges(): EventEmitter<Submittable[]> {
         return this._registry.changes;
     }
 
+    /**
+     * Submittables added to this group.
+     *
+     * @return {Submittable[]} an array of submittables.
+     */
     get submittables(): Submittable[] {
         return this._registry.list;
     }
@@ -117,6 +178,16 @@ export abstract class SubmitGroup extends Submittable {
         }
     }
 
+    /**
+     * Adds submittable to this group.
+     *
+     * The addition would be reported by `submittableChanges` event emitter.
+     *
+     * @param submittable a submittable to add.
+     *
+     * @return {RegistryHandle} a handle that can be used to remove the `submittable` from this group. The removal
+     * would be reported by `submittableChanges` event emitter.
+     */
     addSubmittable(submittable: Submittable): RegistryHandle {
 
         let subscr: Subscription;
@@ -144,28 +215,57 @@ export abstract class SubmitGroup extends Submittable {
 
 }
 
-export abstract class SubmittableControl extends Submittable {
-
-    abstract readonly control: AbstractControl;
-
-}
-
+/**
+ * Input service.
+ *
+ * An input service is registered by {{InputDirective}} to group one or more input fields.
+ */
 export abstract class InputService extends SubmitGroup {
 }
 
+/**
+ * Submit service.
+ *
+ * A submit service is registered alongside Angular forms by {{SubmitReadyDirective}}. The input fields are added
+ * to this service automatically (either directly, or by {{InputService}}). It can be used to submit such forms when
+ * they are ready.
+ */
 export abstract class SubmitService extends SubmitGroup {
 
+    /**
+     * Emits an event on attempt to submit.
+     */
     abstract readonly preSubmit: EventEmitter<any>;
+
+    /**
+     * Emits an event on attempt to submit and all inputs are ready to be submitted.
+     */
     abstract readonly submitReady: EventEmitter<any>;
 
     protected _submitted = false;
 
+    /**
+     * Whether an attempt to submit this form were performed.
+     *
+     * @return {boolean} `true` if `.submit()` method is called.
+     */
     get submitted(): boolean {
         return this._submitted;
     }
 
+    /**
+     * Attempts to submit a form.
+     *
+     * - Sets `.submitted` flag.
+     * - Emits `.preSubmit` event.
+     * - Updates input statuses of all registered submittables with `Submittable.updateInputStatus()`
+     * - If ALL submittables are ready to be submitted, emits a `.submitReady` event.
+     */
     abstract submit(): boolean;
 
+    /**
+     * Resets a submitted flag.
+     */
     resetSubmitted(): void {
         this._submitted = false;
     }
