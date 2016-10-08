@@ -10,6 +10,7 @@ export declare abstract class InputStatus {
     get(id: string | symbol): InputStatus | undefined;
     equals(status: InputStatus | null | undefined): boolean;
     abstract equalValues(status: this): boolean;
+    impliedBy(status: InputStatus): boolean;
     merge(status: InputStatus): InputStatus;
     abstract mergeValues(status: this): this;
     private combine();

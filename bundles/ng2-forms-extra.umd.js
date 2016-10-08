@@ -63,11 +63,20 @@ var InputStatus = (function () {
         }
         return this.combine().equalValues(status.combine());
     };
+    InputStatus.prototype.impliedBy = function (status) {
+        return status === this;
+    };
     InputStatus.prototype.merge = function (status) {
+        if (status.impliedBy(this)) {
+            return this;
+        }
+        if (this.impliedBy(status)) {
+            return status;
+        }
         if (this.id === status.id && !this.nested.length && !status.nested.length) {
             return this.mergeValues(status);
         }
-        return this.combine().add(status);
+        return this.combine().add(status).optimize();
     };
     InputStatus.prototype.combine = function () {
         return new CombinedInputStatus().add(this);
@@ -127,6 +136,16 @@ var CombinedInputStatus = (function (_super) {
     CombinedInputStatus.prototype.mergeValues = function (status) {
         return new CombinedInputStatus().add(this).add(status);
     };
+    CombinedInputStatus.prototype.optimize = function () {
+        var nested = this.nested;
+        if (nested.length <= 1) {
+            if (!nested.length) {
+                return InputReady;
+            }
+            return nested[0];
+        }
+        return this;
+    };
     return CombinedInputStatus;
 }(InputStatus));
 function nestedMapContainsAll(map, other) {
@@ -153,6 +172,9 @@ var InputReadiness = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    InputReadiness.prototype.impliedBy = function (status) {
+        return this.ready === status.ready;
+    };
     InputReadiness.prototype.equalValues = function (status) {
         return this._ready === status._ready;
     };

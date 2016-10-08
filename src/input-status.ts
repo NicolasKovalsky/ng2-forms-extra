@@ -49,11 +49,21 @@ export abstract class InputStatus {
 
     abstract equalValues(status: this): boolean;
 
+    impliedBy(status: InputStatus): boolean {
+        return status === this;
+    }
+
     merge(status: InputStatus): InputStatus {
+        if (status.impliedBy(this)) {
+            return this;
+        }
+        if (this.impliedBy(status)) {
+            return status;
+        }
         if (this.id === status.id && !this.nested.length && !status.nested.length) {
             return this.mergeValues(status as this);
         }
-        return this.combine().add(status);
+        return this.combine().add(status).optimize();
     }
 
     abstract mergeValues(status: this): this;
@@ -127,6 +137,20 @@ class CombinedInputStatus extends InputStatus {
         return new CombinedInputStatus().add(this).add(status) as this;
     }
 
+    optimize(): InputStatus {
+
+        const nested = this.nested;
+
+        if (nested.length <= 1) {
+            if (!nested.length) {
+                return InputReady;
+            }
+            return nested[0];
+        }
+
+        return this;
+    }
+
 }
 
 function nestedMapContainsAll(map: {[key: string]: InputStatus}, other: {[key: string]: InputStatus}): boolean {
@@ -150,6 +174,10 @@ class InputReadiness extends InputStatus {
 
     get ready(): boolean {
         return this._ready;
+    }
+
+    impliedBy(status: InputStatus): boolean {
+        return this.ready === status.ready;
     }
 
     equalValues(status: this): boolean {
