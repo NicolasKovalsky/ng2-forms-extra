@@ -4,11 +4,249 @@
     (factory((global.ng2frex = global.ng2frex || {}),global._angular_common,global._angular_core,global._angular_forms));
 }(this, (function (exports,_angular_common,_angular_core,_angular_forms) { 'use strict';
 
+var __extends$2 = (undefined && undefined.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var InputStatus = (function () {
+    function InputStatus(_id) {
+        this._id = _id;
+    }
+    Object.defineProperty(InputStatus.prototype, "id", {
+        get: function () {
+            return this._id;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InputStatus.prototype, "nested", {
+        get: function () {
+            return [];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InputStatus.prototype, "ready", {
+        get: function () {
+            var readiness = this.get(inputReadinessId);
+            return readiness == null || readiness.ready;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InputStatus.prototype, "errors", {
+        get: function () {
+            var errors = this.get(inputErrorsId);
+            return errors && errors.errors;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    InputStatus.prototype.get = function (id) {
+        return id === this.id ? this : undefined;
+    };
+    InputStatus.prototype.equals = function (status) {
+        if (!status) {
+            return false;
+        }
+        if (status === this) {
+            return true;
+        }
+        if (this.id === status.id) {
+            if (this.nested.length != status.nested.length) {
+                return false;
+            }
+            if (!this.nested.length) {
+                return this.equalValues(status);
+            }
+        }
+        return this.combine().equalValues(status.combine());
+    };
+    InputStatus.prototype.merge = function (status) {
+        if (this.id === status.id && !this.nested.length && !status.nested.length) {
+            return this.mergeValues(status);
+        }
+        return this.combine().add(status);
+    };
+    InputStatus.prototype.combine = function () {
+        return new CombinedInputStatus().add(this);
+    };
+    return InputStatus;
+}());
+var combinedInputStatusId = "__combined__";
+var CombinedInputStatus = (function (_super) {
+    __extends$2(CombinedInputStatus, _super);
+    function CombinedInputStatus() {
+        _super.call(this, combinedInputStatusId);
+        this._map = {};
+    }
+    CombinedInputStatus.prototype.get = function (id) {
+        return id === this.id ? this : this._map[id];
+    };
+    Object.defineProperty(CombinedInputStatus.prototype, "nested", {
+        get: function () {
+            if (this._list) {
+                return this._list;
+            }
+            var list = [];
+            for (var id in this._map) {
+                if (this._map.hasOwnProperty(id)) {
+                    list.push(this._map[id]);
+                }
+            }
+            this._list = list;
+            return list;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    CombinedInputStatus.prototype.add = function (status) {
+        this._list = undefined;
+        if (status.id !== this.id) {
+            var prev = this._map[status.id];
+            if (!prev) {
+                this._map[status.id] = status;
+            }
+            else {
+                this._map[status.id] = prev.mergeValues(status);
+            }
+        }
+        for (var _i = 0, _a = status.nested; _i < _a.length; _i++) {
+            var st = _a[_i];
+            this.add(st);
+        }
+        return this;
+    };
+    CombinedInputStatus.prototype.equalValues = function (status) {
+        return nestedMapContainsAll(this._map, status._map) && mapContainsKeys(status._map, this._map);
+    };
+    CombinedInputStatus.prototype.merge = function (status) {
+        return _super.prototype.merge.call(this, status);
+    };
+    CombinedInputStatus.prototype.mergeValues = function (status) {
+        return new CombinedInputStatus().add(this).add(status);
+    };
+    return CombinedInputStatus;
+}(InputStatus));
+function nestedMapContainsAll(map, other) {
+    for (var key in map) {
+        if (map.hasOwnProperty(key)) {
+            if (!map[key].equals(other[key])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+var inputReadinessId = "__readiness__";
+var InputReadiness = (function (_super) {
+    __extends$2(InputReadiness, _super);
+    function InputReadiness(_ready) {
+        _super.call(this, inputReadinessId);
+        this._ready = _ready;
+    }
+    Object.defineProperty(InputReadiness.prototype, "ready", {
+        get: function () {
+            return this._ready;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    InputReadiness.prototype.equalValues = function (status) {
+        return this._ready === status._ready;
+    };
+    InputReadiness.prototype.mergeValues = function (status) {
+        return this.ready ? status : this;
+    };
+    return InputReadiness;
+}(InputStatus));
+var InputReady = new InputReadiness(true);
+var InputNotReady = new InputReadiness(false);
+var inputErrorsId = "__errors__";
+var InputErrors = (function (_super) {
+    __extends$2(InputErrors, _super);
+    function InputErrors(_errors) {
+        _super.call(this, inputErrorsId);
+        this._errors = _errors;
+    }
+    Object.defineProperty(InputErrors.prototype, "errors", {
+        get: function () {
+            return this._errors;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    InputErrors.prototype.equalValues = function (status) {
+        return equalMaps(this._errors, status._errors);
+    };
+    InputErrors.prototype.mergeValues = function (status) {
+        if (this._errors === status._errors) {
+            return this;
+        }
+        var errors = {};
+        for (var key in this._errors) {
+            if (this._errors.hasOwnProperty(key)) {
+                errors[key] = this._errors[key];
+            }
+        }
+        for (var key in status._errors) {
+            if (status._errors.hasOwnProperty(key)) {
+                errors[key] = status._errors[key];
+            }
+        }
+        return new InputErrors(errors);
+    };
+    return InputErrors;
+}(InputStatus));
+function equalMaps(map1, map2) {
+    return mapContainsAll(map1, map2) && mapContainsKeys(map2, map1);
+}
+function mapContainsKeys(map, other) {
+    for (var key in map) {
+        if (map.hasOwnProperty(key)) {
+            if (!other.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+function mapContainsAll(map, other) {
+    for (var key in map) {
+        if (map.hasOwnProperty(key)) {
+            if (map[key] !== other[key]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 var __extends$1 = (undefined && undefined.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Submittable = (function () {
+    function Submittable() {
+    }
+    Object.defineProperty(Submittable.prototype, "ready", {
+        get: function () {
+            return this.inputStatus.ready;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Submittable.prototype, "errors", {
+        get: function () {
+            return this.inputStatus.errors;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Submittable;
+}());
 var Registry = (function () {
     function Registry() {
         this.changes = new _angular_core.EventEmitter();
@@ -50,15 +288,17 @@ var Registry = (function () {
     return Registry;
 }());
 var resolved = Promise.resolve();
-var SubmitGroup = (function () {
+var SubmitGroup = (function (_super) {
+    __extends$1(SubmitGroup, _super);
     function SubmitGroup() {
-        this.readyStateChanges = new _angular_core.EventEmitter();
+        _super.call(this);
+        this.inputStatusChange = new _angular_core.EventEmitter();
         this._registry = new Registry();
-        this._ready = true;
+        this._inputStatus = InputReady;
     }
-    Object.defineProperty(SubmitGroup.prototype, "ready", {
+    Object.defineProperty(SubmitGroup.prototype, "inputStatus", {
         get: function () {
-            return this._ready;
+            return this._inputStatus;
         },
         enumerable: true,
         configurable: true
@@ -77,20 +317,20 @@ var SubmitGroup = (function () {
         enumerable: true,
         configurable: true
     });
-    SubmitGroup.prototype.updateReadyState = function (_a) {
+    SubmitGroup.prototype.updateInputStatus = function (_a) {
         var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        var ready = !this.submittables.some(function (s) { return !s.updateReadyState({ emitEvents: false }); });
-        this.setReadyState(ready, { emitEvents: emitEvents });
-        return ready;
+        var status = this.submittables.reduce(function (combined, s) { return combined.merge(s.updateInputStatus({ emitEvents: false })); }, InputReady);
+        this.setInputStatus(status, { emitEvents: emitEvents });
+        return status;
     };
-    SubmitGroup.prototype.setReadyState = function (ready, _a) {
+    SubmitGroup.prototype.setInputStatus = function (status, _a) {
         var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        if (this._ready === ready) {
+        if (this._inputStatus.equals(status)) {
             return;
         }
-        this._ready = ready;
+        this._inputStatus = status;
         if (emitEvents !== false) {
-            this.readyStateChanges.emit(ready);
+            this.inputStatusChange.emit(status);
         }
     };
     SubmitGroup.prototype.addSubmittable = function (submittable) {
@@ -103,18 +343,11 @@ var SubmitGroup = (function () {
                 reg.unregister();
             }
             finally {
-                _this.updateReadyState();
+                _this.updateInputStatus();
             }
         });
-        this.updateReadyState();
-        subscr = submittable.readyStateChanges.subscribe(function (ready) {
-            if (!ready) {
-                resolved.then(function () { return _this.setReadyState(false); });
-            }
-            else {
-                resolved.then(function () { return _this.updateReadyState(); });
-            }
-        });
+        this.updateInputStatus();
+        subscr = submittable.inputStatusChange.subscribe(function () { return resolved.then(function () { return _this.updateInputStatus(); }); });
         return handle;
     };
     SubmitGroup.prototype.registerSubmittable = function (_submittable) {
@@ -123,7 +356,14 @@ var SubmitGroup = (function () {
         };
     };
     return SubmitGroup;
-}());
+}(Submittable));
+var SubmittableControl = (function (_super) {
+    __extends$1(SubmittableControl, _super);
+    function SubmittableControl() {
+        _super.apply(this, arguments);
+    }
+    return SubmittableControl;
+}(Submittable));
 var InputService = (function (_super) {
     __extends$1(InputService, _super);
     function InputService() {
@@ -177,7 +417,8 @@ var SubmitReadyDirective = (function (_super) {
     SubmitReadyDirective.prototype.submit = function () {
         this._submitted = true;
         this.preSubmit.emit(null);
-        if (!this.updateReadyState({ emitEvents: false })) {
+        var status = this.updateInputStatus({ emitEvents: false });
+        if (!status.ready) {
             return false;
         }
         this.submitReady.emit(null);
@@ -350,7 +591,7 @@ var RepeatOfDirective = (function () {
     return RepeatOfDirective;
 }());
 
-var __extends$2 = (undefined && undefined.__extends) || function (d, b) {
+var __extends$3 = (undefined && undefined.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -365,7 +606,7 @@ var __metadata$4 = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var InputDirective = (function (_super) {
-    __extends$2(InputDirective, _super);
+    __extends$3(InputDirective, _super);
     function InputDirective(_submitService) {
         _super.call(this);
         this._submitService = _submitService;
@@ -373,7 +614,7 @@ var InputDirective = (function (_super) {
     InputDirective.prototype.ngOnInit = function () {
         var _this = this;
         this._regHandle = this._submitService.addSubmittable(this);
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateReadyState(); });
+        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
     };
     InputDirective.prototype.ngOnDestroy = function () {
         if (this._regHandle) {
@@ -405,6 +646,11 @@ var InputDirective = (function (_super) {
     return InputDirective;
 }(InputService));
 
+var __extends$4 = (undefined && undefined.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var __decorate$5 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -417,18 +663,20 @@ var __metadata$5 = (undefined && undefined.__metadata) || function (k, v) {
 var __param = (undefined && undefined.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var InputControlDirective = (function () {
+var InputControlDirective = (function (_super) {
+    __extends$4(InputControlDirective, _super);
     function InputControlDirective(_inputService, _submitGroup, _submitService, _control) {
+        _super.call(this);
         this._inputService = _inputService;
         this._submitGroup = _submitGroup;
         this._submitService = _submitService;
         this._control = _control;
-        this.readyStateChanges = new _angular_core.EventEmitter();
-        this._ready = true;
+        this.inputStatusChange = new _angular_core.EventEmitter();
+        this._inputStatus = InputReady;
     }
-    Object.defineProperty(InputControlDirective.prototype, "ready", {
+    Object.defineProperty(InputControlDirective.prototype, "inputStatus", {
         get: function () {
-            return this._ready;
+            return this._inputStatus;
         },
         enumerable: true,
         configurable: true
@@ -440,22 +688,34 @@ var InputControlDirective = (function () {
         enumerable: true,
         configurable: true
     });
-    InputControlDirective.prototype.updateReadyState = function (_a) {
+    InputControlDirective.prototype.updateInputStatus = function (_a) {
         var _b = (_a === void 0 ? {} : _a).emitEvents, emitEvents = _b === void 0 ? true : _b;
-        var ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
-        if (this._ready !== ready) {
-            this._ready = ready;
+        var status = this.inputReadiness();
+        status = this.addErrors(status);
+        if (!status.equals(this._inputStatus)) {
+            this._inputStatus = status;
             if (emitEvents !== false) {
-                this.readyStateChanges.emit(ready);
+                this.inputStatusChange.emit(status);
             }
         }
-        return ready;
+        return status;
+    };
+    InputControlDirective.prototype.inputReadiness = function () {
+        var ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
+        return ready ? InputReady : InputNotReady;
+    };
+    InputControlDirective.prototype.addErrors = function (status) {
+        var errors = this.control.errors;
+        if (errors) {
+            return status.merge(new InputErrors(errors));
+        }
+        return status;
     };
     InputControlDirective.prototype.ngOnInit = function () {
         var _this = this;
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateReadyState(); });
-        this._stateSubscr = this.control.statusChanges.subscribe(function () { return _this.updateReadyState(); });
-        this.updateReadyState({ emitEvents: false });
+        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
+        this._stateSubscr = this.control.statusChanges.subscribe(function () { return _this.updateInputStatus(); });
+        this.updateInputStatus({ emitEvents: false });
         this._regHandle =
             this._inputService ? this._inputService.addSubmittable(this) : this._submitGroup.addSubmittable(this);
     };
@@ -482,7 +742,7 @@ var InputControlDirective = (function () {
         __metadata$5('design:paramtypes', [InputService, SubmitGroup, SubmitService, _angular_forms.NgControl])
     ], InputControlDirective);
     return InputControlDirective;
-}());
+}(SubmittableControl));
 
 var __decorate$6 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -520,7 +780,7 @@ var InputErrorsComponent = (function () {
     }
     Object.defineProperty(InputErrorsComponent.prototype, "hasErrors", {
         get: function () {
-            return !this._inputService.ready && this.errors.length > 0;
+            return !this._inputService.inputStatus.ready && this.errors.length > 0;
         },
         enumerable: true,
         configurable: true
@@ -550,13 +810,15 @@ var InputErrorsComponent = (function () {
         var _this = this;
         var updateErrors = function () { return resolved$1.then(function () {
             _this._errors.splice(0);
-            controls.map(function (s) { return s.control; }).filter(function (control) { return !!control.errors; }).forEach(function (control) {
-                var errors = control.errors;
-                for (var key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        var message = _this.errorMessage(control, key, errors[key]);
-                        if (message != null) {
-                            _this._errors.push({ key: key, message: message });
+            controls.forEach(function (submittable) {
+                var errors = submittable.inputStatus.errors;
+                if (errors) {
+                    for (var key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            var message = _this.errorMessage(submittable, key, errors[key]);
+                            if (message != null) {
+                                _this._errors.push({ key: key, message: message });
+                            }
                         }
                     }
                 }
@@ -625,7 +887,7 @@ var InputStatusDirective = (function () {
     }
     Object.defineProperty(InputStatusDirective.prototype, "invalid", {
         get: function () {
-            return !this._inputService.ready;
+            return !this._inputService.inputStatus.ready;
         },
         enumerable: true,
         configurable: true
@@ -690,9 +952,15 @@ exports.FormsExtraModule = FormsExtraModule;
 exports.InputDirective = InputDirective;
 exports.InputControlDirective = InputControlDirective;
 exports.InputErrorsComponent = InputErrorsComponent;
+exports.InputStatus = InputStatus;
+exports.InputReady = InputReady;
+exports.InputNotReady = InputNotReady;
+exports.InputErrors = InputErrors;
 exports.InputStatusDirective = InputStatusDirective;
+exports.Submittable = Submittable;
 exports.Registry = Registry;
 exports.SubmitGroup = SubmitGroup;
+exports.SubmittableControl = SubmittableControl;
 exports.InputService = InputService;
 exports.SubmitService = SubmitService;
 exports.NonBlankDirective = NonBlankDirective;

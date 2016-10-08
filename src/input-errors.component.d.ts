@@ -1,8 +1,7 @@
 import { OnDestroy, OnInit } from "@angular/core";
-import { AbstractControl } from "@angular/forms";
-import { InputService } from "./model";
+import { InputService, SubmittableControl } from "./model";
 export interface InputErrorMap {
-    [key: string]: string | ((error: any, control: AbstractControl) => string);
+    [key: string]: string | ((error: any, control: SubmittableControl) => string);
 }
 export interface InputError {
     key: string;

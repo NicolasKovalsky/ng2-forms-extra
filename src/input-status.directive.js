@@ -15,7 +15,7 @@ export var InputStatusDirective = (function () {
     }
     Object.defineProperty(InputStatusDirective.prototype, "invalid", {
         get: function () {
-            return !this._inputService.ready;
+            return !this._inputService.inputStatus.ready;
         },
         enumerable: true,
         configurable: true

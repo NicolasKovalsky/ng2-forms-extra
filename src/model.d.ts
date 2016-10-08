@@ -1,11 +1,16 @@
 import { EventEmitter } from "@angular/core";
 import { AbstractControl } from "@angular/forms";
-export interface Submittable {
+import { InputStatus } from "./input-status";
+export declare abstract class Submittable {
+    readonly abstract inputStatus: InputStatus;
+    readonly abstract inputStatusChange: EventEmitter<InputStatus>;
     readonly ready: boolean;
-    readonly readyStateChanges: EventEmitter<boolean>;
-    updateReadyState(opts?: {
+    readonly errors: {
+        [key: string]: any;
+    } | undefined;
+    abstract updateInputStatus(opts?: {
         emitEvents?: boolean;
-    }): boolean;
+    }): InputStatus;
 }
 export interface RegistryHandle {
     unregister(): void;
@@ -18,24 +23,25 @@ export declare class Registry<T> {
     readonly list: T[];
     add(item: T, handle?: RegistryHandle | (() => void)): RegistryHandle;
 }
-export declare abstract class SubmitGroup<S extends Submittable> implements Submittable {
-    readonly readyStateChanges: EventEmitter<boolean>;
+export declare abstract class SubmitGroup<S extends Submittable> extends Submittable {
+    readonly inputStatusChange: EventEmitter<InputStatus>;
     private _registry;
-    private _ready;
-    readonly ready: boolean;
+    private _inputStatus;
+    constructor();
+    readonly inputStatus: InputStatus;
     readonly submittableChanges: EventEmitter<S[]>;
     readonly submittables: S[];
-    updateReadyState({emitEvents}?: {
+    updateInputStatus({emitEvents}?: {
         emitEvents?: boolean;
-    }): boolean;
-    protected setReadyState(ready: boolean, {emitEvents}?: {
+    }): InputStatus;
+    protected setInputStatus(status: InputStatus, {emitEvents}?: {
         emitEvents?: boolean;
     }): void;
     addSubmittable(submittable: S): RegistryHandle;
     protected registerSubmittable(_submittable: S): RegistryHandle;
 }
-export interface SubmittableControl extends Submittable {
-    readonly control: AbstractControl;
+export declare abstract class SubmittableControl extends Submittable {
+    readonly abstract control: AbstractControl;
 }
 export declare abstract class InputService extends SubmitGroup<SubmittableControl> {
 }

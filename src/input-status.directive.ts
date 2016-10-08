@@ -11,7 +11,7 @@ export class InputStatusDirective {
 
     @HostBinding("class.frex-invalid")
     get invalid(): boolean {
-        return !this._inputService.ready;
+        return !this._inputService.inputStatus.ready;
     }
 
 }

@@ -1,14 +1,23 @@
 import {EventEmitter} from "@angular/core";
 import {AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
+import {InputStatus, InputReady} from "./input-status";
 
-export interface Submittable {
+export abstract class Submittable {
 
-    readonly ready: boolean;
+    abstract readonly inputStatus: InputStatus;
 
-    readonly readyStateChanges: EventEmitter<boolean>;
+    abstract readonly inputStatusChange: EventEmitter<InputStatus>;
 
-    updateReadyState(opts?: {emitEvents?: boolean}): boolean;
+    get ready(): boolean {
+        return this.inputStatus.ready;
+    }
+
+    get errors(): {[key: string]: any} | undefined {
+        return this.inputStatus.errors;
+    }
+
+    abstract updateInputStatus(opts?: {emitEvents?: boolean}): InputStatus;
 
 }
 
@@ -65,14 +74,18 @@ export class Registry<T> {
 
 const resolved = Promise.resolve();
 
-export abstract class SubmitGroup<S extends Submittable> implements Submittable {
+export abstract class SubmitGroup<S extends Submittable> extends Submittable {
 
-    readonly readyStateChanges = new EventEmitter<boolean>();
+    readonly inputStatusChange = new EventEmitter<InputStatus>();
     private _registry = new Registry<S>();
-    private _ready = true;
+    private _inputStatus = InputReady;
 
-    get ready(): boolean {
-        return this._ready;
+    constructor() {
+        super();
+    }
+
+    get inputStatus(): InputStatus {
+        return this._inputStatus;
     }
 
     get submittableChanges(): EventEmitter<S[]> {
@@ -83,22 +96,24 @@ export abstract class SubmitGroup<S extends Submittable> implements Submittable 
         return this._registry.list;
     }
 
-    updateReadyState({emitEvents = true}: {emitEvents?: boolean} = {}): boolean {
+    updateInputStatus({emitEvents = true}: {emitEvents?: boolean} = {}): InputStatus {
 
-        const ready = !this.submittables.some(s => !s.updateReadyState({emitEvents: false}));
+        const status = this.submittables.reduce(
+            (combined, s) => combined.merge(s.updateInputStatus({emitEvents: false})),
+            InputReady);
 
-        this.setReadyState(ready, {emitEvents});
+        this.setInputStatus(status, {emitEvents});
 
-        return ready;
+        return status;
     }
 
-    protected setReadyState(ready: boolean, {emitEvents = true}: {emitEvents?: boolean} = {}) {
-        if (this._ready === ready) {
+    protected setInputStatus(status: InputStatus, {emitEvents = true}: {emitEvents?: boolean} = {}) {
+        if (this._inputStatus.equals(status)) {
             return;
         }
-        this._ready = ready;
+        this._inputStatus = status;
         if (emitEvents !== false) {
-            this.readyStateChanges.emit(ready);
+            this.inputStatusChange.emit(status);
         }
     }
 
@@ -111,18 +126,12 @@ export abstract class SubmitGroup<S extends Submittable> implements Submittable 
             try {
                 reg.unregister();
             } finally {
-                this.updateReadyState();
+                this.updateInputStatus();
             }
         });
 
-        this.updateReadyState();
-        subscr = submittable.readyStateChanges.subscribe((ready: boolean) => {
-            if (!ready) {
-                resolved.then(() => this.setReadyState(false));
-            } else {
-                resolved.then(() => this.updateReadyState());
-            }
-        });
+        this.updateInputStatus();
+        subscr = submittable.inputStatusChange.subscribe(() => resolved.then(() => this.updateInputStatus()));
 
         return handle;
     }
@@ -135,14 +144,13 @@ export abstract class SubmitGroup<S extends Submittable> implements Submittable 
 
 }
 
-export interface SubmittableControl extends Submittable {
+export abstract class SubmittableControl extends Submittable {
 
-    readonly control: AbstractControl;
+    abstract readonly control: AbstractControl;
 
 }
 
 export abstract class InputService extends SubmitGroup<SubmittableControl> {
-
 }
 
 export abstract class SubmitService extends SubmitGroup<Submittable> {

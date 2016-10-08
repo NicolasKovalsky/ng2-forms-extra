@@ -27,7 +27,8 @@ export var SubmitReadyDirective = (function (_super) {
     SubmitReadyDirective.prototype.submit = function () {
         this._submitted = true;
         this.preSubmit.emit(null);
-        if (!this.updateReadyState({ emitEvents: false })) {
+        var status = this.updateInputStatus({ emitEvents: false });
+        if (!status.ready) {
             return false;
         }
         this.submitReady.emit(null);

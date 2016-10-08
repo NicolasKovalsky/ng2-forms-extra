@@ -27,7 +27,7 @@ export class InputDirective extends InputService implements OnInit, OnDestroy {
 
     ngOnInit() {
         this._regHandle = this._submitService.addSubmittable(this);
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(() => this.updateReadyState());
+        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(() => this.updateInputStatus());
     }
 
     ngOnDestroy() {

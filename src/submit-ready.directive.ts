@@ -35,10 +35,15 @@ export class SubmitReadyDirective extends SubmitService implements OnDestroy {
     submit(): boolean {
         this._submitted = true;
         this.preSubmit.emit(null);
-        if (!this.updateReadyState({emitEvents: false})) {
+
+        const status = this.updateInputStatus({emitEvents: false});
+
+        if (!status.ready) {
             return false;
         }
+
         this.submitReady.emit(null);
+
         return true;
     }
 

@@ -2,14 +2,15 @@ import {Directive, Host, OnInit, OnDestroy, EventEmitter, Optional} from "@angul
 import {NgControl, AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {Submittable, SubmitGroup, RegistryHandle, SubmitService, InputService, SubmittableControl} from "./model";
+import {InputStatus, InputErrors, InputReady, InputNotReady} from "./input-status";
 
 @Directive({
     selector: '[ngModel],[formControl],[formControlName]'
 })
-export class InputControlDirective implements SubmittableControl, OnInit, OnDestroy {
+export class InputControlDirective extends SubmittableControl implements OnInit, OnDestroy {
 
-    readonly readyStateChanges = new EventEmitter<boolean>();
-    private _ready = true;
+    readonly inputStatusChange = new EventEmitter<InputStatus>();
+    private _inputStatus = InputReady;
     private _regHandle?: RegistryHandle;
     private _preSubmitSubscr?: Subscription;
     private _stateSubscr?: Subscription;
@@ -19,34 +20,55 @@ export class InputControlDirective implements SubmittableControl, OnInit, OnDest
         private _submitGroup: SubmitGroup<Submittable>,
         private _submitService: SubmitService,
         @Host() private _control: NgControl) {
+        super();
     }
 
-    get ready(): boolean {
-        return this._ready;
+    get inputStatus(): InputStatus {
+        return this._inputStatus;
     }
 
     get control(): AbstractControl {
         return this._control.control;
     }
 
-    updateReadyState({emitEvents = true}: {emitEvents?: boolean} = {}): boolean {
+    updateInputStatus({emitEvents = true}: {emitEvents?: boolean} = {}): InputStatus {
 
-        const ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
+        let status = this.inputReadiness();
 
-        if (this._ready !== ready) {
-            this._ready = ready;
+        status = this.addErrors(status);
+
+        if (!status.equals(this._inputStatus)) {
+            this._inputStatus = status;
             if (emitEvents !== false) {
-                this.readyStateChanges.emit(ready);
+                this.inputStatusChange.emit(status);
             }
         }
 
-        return ready;
+        return status;
+    }
+
+    private inputReadiness() {
+
+        const ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
+
+        return ready ? InputReady : InputNotReady;
+    }
+
+    private addErrors(status: InputStatus) {
+
+        const errors = this.control.errors;
+
+        if (errors) {
+            return status.merge(new InputErrors(errors));
+        }
+
+        return status;
     }
 
     ngOnInit() {
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(() => this.updateReadyState());
-        this._stateSubscr = this.control.statusChanges.subscribe(() => this.updateReadyState());
-        this.updateReadyState({emitEvents: false});
+        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(() => this.updateInputStatus());
+        this._stateSubscr = this.control.statusChanges.subscribe(() => this.updateInputStatus());
+        this.updateInputStatus({emitEvents: false});
         this._regHandle =
             this._inputService ? this._inputService.addSubmittable(this) : this._submitGroup.addSubmittable(this);
     }

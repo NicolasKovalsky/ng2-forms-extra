@@ -23,7 +23,7 @@ export var InputDirective = (function (_super) {
     InputDirective.prototype.ngOnInit = function () {
         var _this = this;
         this._regHandle = this._submitService.addSubmittable(this);
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateReadyState(); });
+        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
     };
     InputDirective.prototype.ngOnDestroy = function () {
         if (this._regHandle) {

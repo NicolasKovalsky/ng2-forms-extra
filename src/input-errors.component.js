@@ -36,7 +36,7 @@ export var InputErrorsComponent = (function () {
     }
     Object.defineProperty(InputErrorsComponent.prototype, "hasErrors", {
         get: function () {
-            return !this._inputService.ready && this.errors.length > 0;
+            return !this._inputService.inputStatus.ready && this.errors.length > 0;
         },
         enumerable: true,
         configurable: true
@@ -66,13 +66,15 @@ export var InputErrorsComponent = (function () {
         var _this = this;
         var updateErrors = function () { return resolved.then(function () {
             _this._errors.splice(0);
-            controls.map(function (s) { return s.control; }).filter(function (control) { return !!control.errors; }).forEach(function (control) {
-                var errors = control.errors;
-                for (var key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        var message = _this.errorMessage(control, key, errors[key]);
-                        if (message != null) {
-                            _this._errors.push({ key: key, message: message });
+            controls.forEach(function (submittable) {
+                var errors = submittable.inputStatus.errors;
+                if (errors) {
+                    for (var key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            var message = _this.errorMessage(submittable, key, errors[key]);
+                            if (message != null) {
+                                _this._errors.push({ key: key, message: message });
+                            }
                         }
                     }
                 }

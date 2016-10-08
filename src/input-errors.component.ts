@@ -1,10 +1,9 @@
 import {Component, Input, OnDestroy, Optional, OnInit} from "@angular/core";
-import {AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {InputService, SubmittableControl} from "./model";
 
 export interface InputErrorMap {
-    [key: string]: string | ((error: any, control: AbstractControl) => string)
+    [key: string]: string | ((error: any, control: SubmittableControl) => string)
 }
 
 const DEFAULT_INPUT_ERRORS_MAP: InputErrorMap = {
@@ -55,7 +54,7 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
     }
 
     get hasErrors(): boolean {
-        return !this._inputService.ready && this.errors.length > 0;
+        return !this._inputService.inputStatus.ready && this.errors.length > 0;
     }
 
     get errors(): InputError[] {
@@ -83,17 +82,19 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
 
         const updateErrors = () => resolved.then(() => {
             this._errors.splice(0);
-            controls.map(s => s.control).filter(control => !!control.errors).forEach(control => {
+            controls.forEach(submittable => {
 
-                const errors = control.errors;
+                const errors = submittable.inputStatus.errors;
 
-                for (let key in errors) {
-                    if (errors.hasOwnProperty(key)) {
+                if (errors) {
+                    for (let key in errors) {
+                        if (errors.hasOwnProperty(key)) {
 
-                        const message = this.errorMessage(control, key, errors[key]);
+                            const message = this.errorMessage(submittable, key, errors[key]);
 
-                        if (message != null) {
-                            this._errors.push({key, message});
+                            if (message != null) {
+                                this._errors.push({key, message});
+                            }
                         }
                     }
                 }
@@ -104,7 +105,7 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
         updateErrors();
     }
 
-    private errorMessage(control: AbstractControl, key: string, value: any): string | undefined {
+    private errorMessage(control: SubmittableControl, key: string, value: any): string | undefined {
         if (value == null) {
             return undefined;
         }
@@ -130,9 +131,9 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
 }
 
 function errorMessage(
-    control: AbstractControl,
+    control: SubmittableControl,
     value: any,
-    message: undefined | string | ((value: any, control: AbstractControl) => string)): string | undefined {
+    message: undefined | string | ((value: any, control: SubmittableControl) => string)): string | undefined {
     if (message == null) {
         return undefined;
     }
