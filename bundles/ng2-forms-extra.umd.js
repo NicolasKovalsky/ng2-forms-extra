@@ -1190,24 +1190,24 @@ var FormsExtraModule = (function () {
     return FormsExtraModule;
 }());
 
-exports.FormsExtraModule = FormsExtraModule;
 exports.InputDirective = InputDirective;
 exports.InputControlDirective = InputControlDirective;
+exports.InputStatusDirective = InputStatusDirective;
+exports.NonBlankDirective = NonBlankDirective;
+exports.RepeatOfDirective = RepeatOfDirective;
+exports.SubmitReadyDirective = SubmitReadyDirective;
+exports.FormsExtraModule = FormsExtraModule;
 exports.InputErrorsComponent = InputErrorsComponent;
 exports.InputStatus = InputStatus;
 exports.InputReady = InputReady;
 exports.InputNotReady = InputNotReady;
 exports.inputStatusControl = inputStatusControl;
 exports.inputErrors = inputErrors;
-exports.InputStatusDirective = InputStatusDirective;
 exports.Submittable = Submittable;
 exports.Registry = Registry;
 exports.SubmitGroup = SubmitGroup;
 exports.InputService = InputService;
 exports.SubmitService = SubmitService;
-exports.NonBlankDirective = NonBlankDirective;
-exports.RepeatOfDirective = RepeatOfDirective;
-exports.SubmitReadyDirective = SubmitReadyDirective;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
