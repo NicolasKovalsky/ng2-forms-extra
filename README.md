@@ -99,7 +99,7 @@ This can be used to indicate validation status or to display validation errors.
 - **Selector:** `[inputStatus],[inputGroup]`
 - **Exported As:** `frexInput` - an instance of `InputService`
 
-Note that `[inputStatus]` selector also attaches an input the validation indicator, while `[inputGroup]` does not.
+Note that `[inputStatus]` selector also attaches an input validation indicator, while the `[inputGroup]` one does not.
 
 
 ### `InputStatusDirective`

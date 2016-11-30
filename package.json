@@ -1,6 +1,6 @@
 {
   "name": "ng2-forms-extra",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Angular2 Forms Extensions",
   "keywords": [
     "angular2",
@@ -34,13 +34,13 @@
     "@angular/core": "^2.0.0",
     "@angular/forms": "^2.0.0",
     "@angular/platform-browser": "^2.0.0",
-    "@types/core-js": "^0.9.32",
     "core-js": "^2.4.1",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "reflect-metadata": "^0.1.8",
     "rollup": "^0.34.13",
     "rxjs": "5.0.0-beta.12",
+    "source-map-loader": "^0.1.5",
     "typescript": "^2.0.3",
     "zone.js": "^0.6.23"
   }
