@@ -13,9 +13,18 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "newLine": "LF",
-    "types": ["core-js"]
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise",
+      "es2015.collection"
+    ]
   },
-  "include": ["index.ts", "src/**/*.ts"]
+  "include": [
+    "index.ts",
+    "src/**/*.ts"
+  ]
 }
