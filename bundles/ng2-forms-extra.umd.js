@@ -909,11 +909,11 @@ var __param = (undefined && undefined.__param) || function (paramIndex, decorato
 };
 var InputControlDirective = (function (_super) {
     __extends$4(InputControlDirective, _super);
-    function InputControlDirective(_submitGroup, _submitService, _control) {
+    function InputControlDirective(_control, _submitGroup, _submitService) {
         _super.call(this);
+        this._control = _control;
         this._submitGroup = _submitGroup;
         this._submitService = _submitService;
-        this._control = _control;
         this.inputStatusChange = new _angular_core.EventEmitter();
         this._inputStatus = InputReady;
     }
@@ -945,7 +945,8 @@ var InputControlDirective = (function (_super) {
         return status;
     };
     InputControlDirective.prototype.addReadiness = function (status) {
-        var ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
+        var affected = this.control.dirty || !this._submitService || this._submitService.submitted;
+        var ready = !(this.control.invalid && affected);
         return status.merge(ready ? InputReady : InputNotReady);
     };
     InputControlDirective.prototype.addErrors = function (status) {
@@ -957,10 +958,11 @@ var InputControlDirective = (function (_super) {
     };
     InputControlDirective.prototype.ngOnInit = function () {
         var _this = this;
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
+        this._preSubmitSubscr =
+            this._submitService && this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
         this._stateSubscr = this.control.statusChanges.subscribe(function () { return _this.updateInputStatus(); });
         this.updateInputStatus({ emitEvents: false });
-        this._regHandle = this._submitGroup.addSubmittable(this);
+        this._regHandle = this._submitGroup && this._submitGroup.addSubmittable(this);
     };
     InputControlDirective.prototype.ngOnDestroy = function () {
         if (this._regHandle) {
@@ -980,8 +982,10 @@ var InputControlDirective = (function (_super) {
         _angular_core.Directive({
             selector: '[ngModel],[formControl],[formControlName]'
         }),
-        __param(2, _angular_core.Host()), 
-        __metadata$5('design:paramtypes', [SubmitGroup, SubmitService, _angular_forms.NgControl])
+        __param(0, _angular_core.Host()),
+        __param(1, _angular_core.Optional()),
+        __param(2, _angular_core.Optional()), 
+        __metadata$5('design:paramtypes', [_angular_forms.NgControl, SubmitGroup, SubmitService])
     ], InputControlDirective);
     return InputControlDirective;
 }(Submittable));

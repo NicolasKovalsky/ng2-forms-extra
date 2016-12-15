@@ -12,7 +12,7 @@ function compile(opts, cb) {
             if (err) {
                 console.error(stderr);
             }
-            cb();
+            cb(err);
         });
 }
 

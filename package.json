@@ -1,6 +1,6 @@
 {
   "name": "ng2-forms-extra",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Angular2 Forms Extensions",
   "keywords": [
     "angular2",
@@ -25,23 +25,23 @@
     "@angular/platform-browser": "^2.0.0",
     "core-js": "^2.4.1",
     "reflect-metadata": "^0.1.8",
-    "rxjs": "5.0.0-beta.12",
-    "zone.js": "^0.6.23"
+    "rxjs": "^5.0.0-beta.12",
+    "zone.js": ">=0.6.23"
   },
   "devDependencies": {
-    "@angular/common": "^2.0.0",
-    "@angular/compiler": "^2.0.0",
-    "@angular/core": "^2.0.0",
-    "@angular/forms": "^2.0.0",
-    "@angular/platform-browser": "^2.0.0",
+    "@angular/common": "^2.3.1",
+    "@angular/compiler": "^2.3.1",
+    "@angular/core": "^2.3.1",
+    "@angular/forms": "^2.3.1",
+    "@angular/platform-browser": "^2.3.1",
     "core-js": "^2.4.1",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "reflect-metadata": "^0.1.8",
     "rollup": "^0.34.13",
-    "rxjs": "5.0.0-beta.12",
+    "rxjs": "5.0.0-rc.4",
     "source-map-loader": "^0.1.5",
-    "typescript": "^2.0.3",
-    "zone.js": "^0.6.23"
+    "typescript": "~2.0.10",
+    "zone.js": "0.7.2"
   }
 }
