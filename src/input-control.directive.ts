@@ -1,4 +1,4 @@
-import {Directive, Host, OnInit, OnDestroy, EventEmitter} from "@angular/core";
+import {Directive, Host, OnInit, OnDestroy, EventEmitter, Optional} from "@angular/core";
 import {NgControl, AbstractControl} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {Submittable, SubmitGroup, RegistryHandle, SubmitService} from "./model";
@@ -17,9 +17,9 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
     private _stateSubscr?: Subscription;
 
     constructor(
-        private _submitGroup: SubmitGroup,
-        private _submitService: SubmitService,
-        @Host() private _control: NgControl) {
+        @Host() private _control: NgControl,
+        @Optional() private _submitGroup?: SubmitGroup,
+        @Optional() private _submitService?: SubmitService) {
         super();
     }
 
@@ -50,7 +50,8 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
 
     private addReadiness(status: InputStatus) {
 
-        const ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
+        const affected = this.control.dirty || !this._submitService || this._submitService.submitted;
+        const ready = !(this.control.invalid && affected);
 
         return status.merge(ready ? InputReady : InputNotReady);
     }
@@ -67,10 +68,11 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
     }
 
     ngOnInit() {
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(() => this.updateInputStatus());
+        this._preSubmitSubscr =
+            this._submitService && this._submitService.preSubmit.subscribe(() => this.updateInputStatus());
         this._stateSubscr = this.control.statusChanges.subscribe(() => this.updateInputStatus());
         this.updateInputStatus({emitEvents: false});
-        this._regHandle = this._submitGroup.addSubmittable(this);
+        this._regHandle = this._submitGroup && this._submitGroup.addSubmittable(this);
     }
 
     ngOnDestroy() {

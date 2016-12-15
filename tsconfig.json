@@ -15,6 +15,7 @@
     "strictNullChecks": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "noEmitOnError": true,
     "newLine": "LF",
     "lib": [
       "dom",

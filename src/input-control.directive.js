@@ -15,18 +15,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Directive, Host, EventEmitter } from "@angular/core";
+import { Directive, Host, EventEmitter, Optional } from "@angular/core";
 import { NgControl } from "@angular/forms";
 import { Submittable, SubmitGroup, SubmitService } from "./model";
 import { InputReady, InputNotReady, inputErrors } from "./input-status";
 import { inputStatusControl } from "./input-status";
 export var InputControlDirective = (function (_super) {
     __extends(InputControlDirective, _super);
-    function InputControlDirective(_submitGroup, _submitService, _control) {
+    function InputControlDirective(_control, _submitGroup, _submitService) {
         _super.call(this);
+        this._control = _control;
         this._submitGroup = _submitGroup;
         this._submitService = _submitService;
-        this._control = _control;
         this.inputStatusChange = new EventEmitter();
         this._inputStatus = InputReady;
     }
@@ -58,7 +58,8 @@ export var InputControlDirective = (function (_super) {
         return status;
     };
     InputControlDirective.prototype.addReadiness = function (status) {
-        var ready = !(this.control.invalid && (this.control.dirty || this._submitService.submitted));
+        var affected = this.control.dirty || !this._submitService || this._submitService.submitted;
+        var ready = !(this.control.invalid && affected);
         return status.merge(ready ? InputReady : InputNotReady);
     };
     InputControlDirective.prototype.addErrors = function (status) {
@@ -70,10 +71,11 @@ export var InputControlDirective = (function (_super) {
     };
     InputControlDirective.prototype.ngOnInit = function () {
         var _this = this;
-        this._preSubmitSubscr = this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
+        this._preSubmitSubscr =
+            this._submitService && this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
         this._stateSubscr = this.control.statusChanges.subscribe(function () { return _this.updateInputStatus(); });
         this.updateInputStatus({ emitEvents: false });
-        this._regHandle = this._submitGroup.addSubmittable(this);
+        this._regHandle = this._submitGroup && this._submitGroup.addSubmittable(this);
     };
     InputControlDirective.prototype.ngOnDestroy = function () {
         if (this._regHandle) {
@@ -93,8 +95,10 @@ export var InputControlDirective = (function (_super) {
         Directive({
             selector: '[ngModel],[formControl],[formControlName]'
         }),
-        __param(2, Host()), 
-        __metadata('design:paramtypes', [SubmitGroup, SubmitService, NgControl])
+        __param(0, Host()),
+        __param(1, Optional()),
+        __param(2, Optional()), 
+        __metadata('design:paramtypes', [NgControl, SubmitGroup, SubmitService])
     ], InputControlDirective);
     return InputControlDirective;
 }(Submittable));
