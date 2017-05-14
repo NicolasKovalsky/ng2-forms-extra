@@ -13,7 +13,7 @@ export declare class InputControlDirective extends Submittable implements OnInit
     private _stateSubscr?;
     constructor(_control: NgControl, _submitGroup?: SubmitGroup, _submitService?: SubmitService);
     readonly inputStatus: InputStatus;
-    readonly control: AbstractControl;
+    readonly control: AbstractControl | undefined;
     updateInputStatus({emitEvents}?: {
         emitEvents?: boolean;
     }): InputStatus;

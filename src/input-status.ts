@@ -328,7 +328,7 @@ export const InputNotReady: InputStatus = new InputReadiness(false);
  *
  * @param control a control which status should be represented.
  */
-export function inputStatusControl(control: AbstractControl): InputStatus {
+export function inputStatusControl(control: AbstractControl | undefined): InputStatus {
     return new InputStatusControl(control);
 }
 

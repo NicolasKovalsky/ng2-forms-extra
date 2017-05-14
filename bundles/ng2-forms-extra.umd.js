@@ -1,14 +1,19 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/common'), require('@angular/core'), require('@angular/forms')) :
-    typeof define === 'function' && define.amd ? define(['exports', '@angular/common', '@angular/core', '@angular/forms'], factory) :
-    (factory((global.ng2frex = global.ng2frex || {}),global._angular_common,global._angular_core,global._angular_forms));
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/common'), require('@angular/core'), require('@angular/forms')) :
+	typeof define === 'function' && define.amd ? define(['exports', '@angular/common', '@angular/core', '@angular/forms'], factory) :
+	(factory((global.ng2frex = global.ng2frex || {}),global._angular_common,global._angular_core,global._angular_forms));
 }(this, (function (exports,_angular_common,_angular_core,_angular_forms) { 'use strict';
 
-var __extends$2 = (undefined && undefined.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends$2 = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /**
  * Input status interface.
  *
@@ -179,8 +184,9 @@ var combinedInputStatusId = "__combined__";
 var CombinedInputStatus = (function (_super) {
     __extends$2(CombinedInputStatus, _super);
     function CombinedInputStatus() {
-        _super.call(this, combinedInputStatusId);
-        this._map = {};
+        var _this = _super.call(this, combinedInputStatusId) || this;
+        _this._map = {};
+        return _this;
     }
     CombinedInputStatus.prototype.get = function (id) {
         return id === this.id ? this : this._map[id];
@@ -260,8 +266,9 @@ var inputReadinessId = "__readiness__";
 var InputReadiness = (function (_super) {
     __extends$2(InputReadiness, _super);
     function InputReadiness(_ready) {
-        _super.call(this, inputReadinessId);
-        this._ready = _ready;
+        var _this = _super.call(this, inputReadinessId) || this;
+        _this._ready = _ready;
+        return _this;
     }
     Object.defineProperty(InputReadiness.prototype, "ready", {
         get: function () {
@@ -306,8 +313,9 @@ var inputStatusControlId = "__control__";
 var InputStatusControl = (function (_super) {
     __extends$2(InputStatusControl, _super);
     function InputStatusControl(_control) {
-        _super.call(this, inputStatusControlId);
-        this._control = _control;
+        var _this = _super.call(this, inputStatusControlId) || this;
+        _this._control = _control;
+        return _this;
     }
     Object.defineProperty(InputStatusControl.prototype, "control", {
         get: function () {
@@ -348,8 +356,9 @@ var inputErrorsId = "__errors__";
 var InputErrors = (function (_super) {
     __extends$2(InputErrors, _super);
     function InputErrors(_errors) {
-        _super.call(this, inputErrorsId);
-        this._errors = _errors;
+        var _this = _super.call(this, inputErrorsId) || this;
+        _this._errors = _errors;
+        return _this;
     }
     Object.defineProperty(InputErrors.prototype, "errors", {
         get: function () {
@@ -404,11 +413,16 @@ function mapContainsAll(map, other) {
     return true;
 }
 
-var __extends$1 = (undefined && undefined.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends$1 = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /**
  * Submittable interface.
  *
@@ -502,10 +516,11 @@ var resolved = Promise.resolve();
 var SubmitGroup = (function (_super) {
     __extends$1(SubmitGroup, _super);
     function SubmitGroup() {
-        _super.call(this);
-        this.inputStatusChange = new _angular_core.EventEmitter();
-        this._registry = new Registry();
-        this._inputStatus = InputReady;
+        var _this = _super.call(this) || this;
+        _this.inputStatusChange = new _angular_core.EventEmitter();
+        _this._registry = new Registry();
+        _this._inputStatus = InputReady;
+        return _this;
     }
     Object.defineProperty(SubmitGroup.prototype, "inputStatus", {
         get: function () {
@@ -596,7 +611,7 @@ var SubmitGroup = (function (_super) {
 var InputService = (function (_super) {
     __extends$1(InputService, _super);
     function InputService() {
-        _super.apply(this, arguments);
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     return InputService;
 }(SubmitGroup));
@@ -610,8 +625,9 @@ var InputService = (function (_super) {
 var SubmitService = (function (_super) {
     __extends$1(SubmitService, _super);
     function SubmitService() {
-        _super.apply(this, arguments);
-        this._submitted = false;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._submitted = false;
+        return _this;
     }
     Object.defineProperty(SubmitService.prototype, "submitted", {
         /**
@@ -634,26 +650,23 @@ var SubmitService = (function (_super) {
     return SubmitService;
 }(SubmitGroup));
 
-var __extends = (undefined && undefined.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var __decorate$1 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$1 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var SubmitReadyDirective = (function (_super) {
     __extends(SubmitReadyDirective, _super);
     function SubmitReadyDirective() {
-        _super.call(this);
-        this.preSubmit = new _angular_core.EventEmitter();
-        this.submitReady = new _angular_core.EventEmitter();
+        var _this = _super.call(this) || this;
+        _this.preSubmit = new _angular_core.EventEmitter();
+        _this.submitReady = new _angular_core.EventEmitter();
+        return _this;
     }
     SubmitReadyDirective.prototype.onSubmit = function () {
         this.submit();
@@ -671,50 +684,32 @@ var SubmitReadyDirective = (function (_super) {
     SubmitReadyDirective.prototype.ngOnDestroy = function () {
         this.submitReady.complete();
     };
-    __decorate$1([
-        _angular_core.Output(), 
-        __metadata$1('design:type', Object)
-    ], SubmitReadyDirective.prototype, "preSubmit", void 0);
-    __decorate$1([
-        _angular_core.Output(), 
-        __metadata$1('design:type', Object)
-    ], SubmitReadyDirective.prototype, "submitReady", void 0);
-    __decorate$1([
-        _angular_core.HostListener('ngSubmit'), 
-        __metadata$1('design:type', Function), 
-        __metadata$1('design:paramtypes', []), 
-        __metadata$1('design:returntype', void 0)
-    ], SubmitReadyDirective.prototype, "onSubmit", null);
-    SubmitReadyDirective = __decorate$1([
-        _angular_core.Directive({
-            selector: 'form:not([ngNoForm]),ngForm,[ngForm],[formGroup]',
-            exportAs: "frexSubmit",
-            providers: [
-                {
-                    provide: SubmitService,
-                    useExisting: _angular_core.forwardRef(function () { return SubmitReadyDirective; }),
-                },
-                {
-                    provide: SubmitGroup,
-                    useExisting: SubmitService,
-                },
-            ]
-        }), 
-        __metadata$1('design:paramtypes', [])
-    ], SubmitReadyDirective);
     return SubmitReadyDirective;
 }(SubmitService));
+SubmitReadyDirective.decorators = [
+    { type: _angular_core.Directive, args: [{
+                selector: 'form:not([ngNoForm]),ngForm,[ngForm],[formGroup]',
+                exportAs: "frexSubmit",
+                providers: [
+                    {
+                        provide: SubmitService,
+                        useExisting: _angular_core.forwardRef(function () { return SubmitReadyDirective; }),
+                    },
+                    {
+                        provide: SubmitGroup,
+                        useExisting: SubmitService,
+                    },
+                ]
+            },] },
+];
+/** @nocollapse */
+SubmitReadyDirective.ctorParameters = function () { return []; };
+SubmitReadyDirective.propDecorators = {
+    'preSubmit': [{ type: _angular_core.Output },],
+    'submitReady': [{ type: _angular_core.Output },],
+    'onSubmit': [{ type: _angular_core.HostListener, args: ['ngSubmit',] },],
+};
 
-var __decorate$2 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$2 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var VALID = null;
 var NOOP = function () { };
 var NonBlankDirective = (function () {
     function NonBlankDirective() {
@@ -732,41 +727,32 @@ var NonBlankDirective = (function () {
         configurable: true
     });
     NonBlankDirective.prototype.validate = function (c) {
-        return this.nonBlank ? _angular_forms.Validators.required(c) : VALID;
+        return this.nonBlank ? _angular_forms.Validators.required(c) : null;
     };
     NonBlankDirective.prototype.registerOnValidatorChange = function (fn) {
         this._onChange = fn || NOOP;
     };
-    __decorate$2([
-        _angular_core.Input(), 
-        __metadata$2('design:type', Boolean)
-    ], NonBlankDirective.prototype, "nonBlank", null);
-    NonBlankDirective = __decorate$2([
-        _angular_core.Directive({
-            selector: '[nonBlank]',
-            providers: [
-                {
-                    provide: _angular_forms.NG_VALIDATORS,
-                    useExisting: _angular_core.forwardRef(function () { return NonBlankDirective; }),
-                    multi: true,
-                }
-            ],
-        }), 
-        __metadata$2('design:paramtypes', [])
-    ], NonBlankDirective);
     return NonBlankDirective;
 }());
+NonBlankDirective.decorators = [
+    { type: _angular_core.Directive, args: [{
+                selector: '[nonBlank]',
+                providers: [
+                    {
+                        provide: _angular_forms.NG_VALIDATORS,
+                        useExisting: _angular_core.forwardRef(function () { return NonBlankDirective; }),
+                        multi: true,
+                    }
+                ],
+            },] },
+];
+/** @nocollapse */
+NonBlankDirective.ctorParameters = function () { return []; };
+NonBlankDirective.propDecorators = {
+    'nonBlank': [{ type: _angular_core.Input },],
+};
 
-var __decorate$3 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$3 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var VALID$1 = null;
+var VALID = null;
 var NOOP$1 = function () { };
 var RepeatOfDirective = (function () {
     function RepeatOfDirective(_injector) {
@@ -785,13 +771,13 @@ var RepeatOfDirective = (function () {
     });
     RepeatOfDirective.prototype.validate = function (control) {
         if (!this._repeatOf) {
-            return VALID$1;
+            return VALID;
         }
         if (control.value == null || control.value === "") {
-            return VALID$1;
+            return VALID;
         }
         if (control.value == this._repeatOf.value) {
-            return VALID$1;
+            return VALID;
         }
         return { "repeat": "Values don't match" };
     };
@@ -805,8 +791,11 @@ var RepeatOfDirective = (function () {
         if (!this._repeatOf) {
             return;
         }
-        var control = this._injector.get(_angular_forms.NgControl);
-        this._repeatOfSubscr = this._repeatOf.control.valueChanges.subscribe(function (value) { return control.control.updateValueAndValidity(); });
+        var control = this._injector.get(_angular_forms.NgControl).control;
+        var repeatOfControl = this._repeatOf.control;
+        if (control && repeatOfControl) {
+            this._repeatOfSubscr = repeatOfControl.valueChanges.subscribe(function (value) { return control.updateValueAndValidity(); });
+        }
     };
     RepeatOfDirective.prototype.unsubscribe = function () {
         if (this._repeatOfSubscr) {
@@ -814,46 +803,44 @@ var RepeatOfDirective = (function () {
             this._repeatOfSubscr = undefined;
         }
     };
-    __decorate$3([
-        _angular_core.Input(), 
-        __metadata$3('design:type', _angular_forms.AbstractControlDirective), 
-        __metadata$3('design:paramtypes', [_angular_forms.AbstractControlDirective])
-    ], RepeatOfDirective.prototype, "repeatOf", null);
-    RepeatOfDirective = __decorate$3([
-        _angular_core.Directive({
-            selector: '[repeatOf]',
-            providers: [
-                {
-                    provide: _angular_forms.NG_VALIDATORS,
-                    useExisting: _angular_core.forwardRef(function () { return RepeatOfDirective; }),
-                    multi: true,
-                }
-            ],
-        }), 
-        __metadata$3('design:paramtypes', [_angular_core.Injector])
-    ], RepeatOfDirective);
     return RepeatOfDirective;
 }());
+RepeatOfDirective.decorators = [
+    { type: _angular_core.Directive, args: [{
+                selector: '[repeatOf]',
+                providers: [
+                    {
+                        provide: _angular_forms.NG_VALIDATORS,
+                        useExisting: _angular_core.forwardRef(function () { return RepeatOfDirective; }),
+                        multi: true,
+                    }
+                ],
+            },] },
+];
+/** @nocollapse */
+RepeatOfDirective.ctorParameters = function () { return [
+    { type: _angular_core.Injector, },
+]; };
+RepeatOfDirective.propDecorators = {
+    'repeatOf': [{ type: _angular_core.Input },],
+};
 
-var __extends$3 = (undefined && undefined.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var __decorate$4 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$4 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
+var __extends$3 = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var InputDirective = (function (_super) {
     __extends$3(InputDirective, _super);
     function InputDirective(_submitService) {
-        _super.call(this);
-        this._submitService = _submitService;
+        var _this = _super.call(this) || this;
+        _this._submitService = _submitService;
+        return _this;
     }
     InputDirective.prototype.ngOnInit = function () {
         var _this = this;
@@ -870,52 +857,49 @@ var InputDirective = (function (_super) {
             delete this._preSubmitSubscr;
         }
     };
-    InputDirective = __decorate$4([
-        _angular_core.Directive({
-            selector: '[inputStatus],[inputGroup]',
-            exportAs: "frexInput",
-            providers: [
-                {
-                    provide: InputService,
-                    useExisting: _angular_core.forwardRef(function () { return InputDirective; }),
-                },
-                {
-                    provide: SubmitGroup,
-                    useExisting: InputService,
-                },
-            ]
-        }), 
-        __metadata$4('design:paramtypes', [SubmitService])
-    ], InputDirective);
     return InputDirective;
 }(InputService));
+InputDirective.decorators = [
+    { type: _angular_core.Directive, args: [{
+                selector: '[inputStatus],[inputGroup]',
+                exportAs: "frexInput",
+                providers: [
+                    {
+                        provide: InputService,
+                        useExisting: _angular_core.forwardRef(function () { return InputDirective; }),
+                    },
+                    {
+                        provide: SubmitGroup,
+                        useExisting: InputService,
+                    },
+                ]
+            },] },
+];
+/** @nocollapse */
+InputDirective.ctorParameters = function () { return [
+    { type: SubmitService, },
+]; };
 
-var __extends$4 = (undefined && undefined.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var __decorate$5 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$5 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (undefined && undefined.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
+var __extends$4 = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var InputControlDirective = (function (_super) {
     __extends$4(InputControlDirective, _super);
     function InputControlDirective(_control, _submitGroup, _submitService) {
-        _super.call(this);
-        this._control = _control;
-        this._submitGroup = _submitGroup;
-        this._submitService = _submitService;
-        this.inputStatusChange = new _angular_core.EventEmitter();
-        this._inputStatus = InputReady;
+        var _this = _super.call(this) || this;
+        _this._control = _control;
+        _this._submitGroup = _submitGroup;
+        _this._submitService = _submitService;
+        _this.inputStatusChange = new _angular_core.EventEmitter();
+        _this._inputStatus = InputReady;
+        return _this;
     }
     Object.defineProperty(InputControlDirective.prototype, "inputStatus", {
         get: function () {
@@ -926,7 +910,7 @@ var InputControlDirective = (function (_super) {
     });
     Object.defineProperty(InputControlDirective.prototype, "control", {
         get: function () {
-            return this._control.control;
+            return this._control.control || undefined;
         },
         enumerable: true,
         configurable: true
@@ -945,12 +929,20 @@ var InputControlDirective = (function (_super) {
         return status;
     };
     InputControlDirective.prototype.addReadiness = function (status) {
-        var affected = this.control.dirty || !this._submitService || this._submitService.submitted;
-        var ready = !(this.control.invalid && affected);
+        var control = this.control;
+        if (!control) {
+            return status.merge(InputReady);
+        }
+        var affected = control.dirty || !this._submitService || this._submitService.submitted;
+        var ready = !(control.invalid && affected);
         return status.merge(ready ? InputReady : InputNotReady);
     };
     InputControlDirective.prototype.addErrors = function (status) {
-        var errors = this.control.errors;
+        var control = this.control;
+        if (!control) {
+            return status;
+        }
+        var errors = control.errors;
         if (errors) {
             return status.merge(inputErrors(errors));
         }
@@ -960,7 +952,10 @@ var InputControlDirective = (function (_super) {
         var _this = this;
         this._preSubmitSubscr =
             this._submitService && this._submitService.preSubmit.subscribe(function () { return _this.updateInputStatus(); });
-        this._stateSubscr = this.control.statusChanges.subscribe(function () { return _this.updateInputStatus(); });
+        var control = this.control;
+        if (control) {
+            this._stateSubscr = control.statusChanges.subscribe(function () { return _this.updateInputStatus(); });
+        }
         this.updateInputStatus({ emitEvents: false });
         this._regHandle = this._submitGroup && this._submitGroup.addSubmittable(this);
     };
@@ -978,30 +973,20 @@ var InputControlDirective = (function (_super) {
             delete this._preSubmitSubscr;
         }
     };
-    InputControlDirective = __decorate$5([
-        _angular_core.Directive({
-            selector: '[ngModel],[formControl],[formControlName]'
-        }),
-        __param(0, _angular_core.Host()),
-        __param(1, _angular_core.Optional()),
-        __param(2, _angular_core.Optional()), 
-        __metadata$5('design:paramtypes', [_angular_forms.NgControl, SubmitGroup, SubmitService])
-    ], InputControlDirective);
     return InputControlDirective;
 }(Submittable));
+InputControlDirective.decorators = [
+    { type: _angular_core.Directive, args: [{
+                selector: '[ngModel],[formControl],[formControlName]'
+            },] },
+];
+/** @nocollapse */
+InputControlDirective.ctorParameters = function () { return [
+    { type: _angular_forms.NgControl, decorators: [{ type: _angular_core.Host },] },
+    { type: SubmitGroup, decorators: [{ type: _angular_core.Optional },] },
+    { type: SubmitService, decorators: [{ type: _angular_core.Optional },] },
+]; };
 
-var __decorate$6 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$6 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param$1 = (undefined && undefined.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 var DEFAULT_INPUT_ERRORS_MAP = {
     required: "This field is required",
     minlength: function (error) {
@@ -1090,24 +1075,25 @@ var InputErrorsComponent = (function () {
         }
         return key;
     };
-    __decorate$6([
-        _angular_core.Input(), 
-        __metadata$6('design:type', Object)
-    ], InputErrorsComponent.prototype, "inputErrorsMap", void 0);
-    InputErrorsComponent = __decorate$6([
-        _angular_core.Component({
-            selector: 'input-errors,[inputErrors],[inputErrorsMap]',
-            template: "\n    <ul class=\"frex-error-list\" *ngIf=\"hasErrors\">\n        <li *ngFor=\"let error of errors; trackBy: trackError\" class=\"frex-error\">{{error.message}}</li>\n    </ul>\n    ",
-            host: {
-                '[class.frex-errors]': 'true',
-                '[class.frex-no-errors]': '!hasErrors',
-            }
-        }),
-        __param$1(0, _angular_core.Optional()), 
-        __metadata$6('design:paramtypes', [SubmitGroup])
-    ], InputErrorsComponent);
     return InputErrorsComponent;
 }());
+InputErrorsComponent.decorators = [
+    { type: _angular_core.Component, args: [{
+                selector: 'input-errors,[inputErrors],[inputErrorsMap]',
+                template: "\n    <ul class=\"frex-error-list\" *ngIf=\"hasErrors\">\n        <li *ngFor=\"let error of errors; trackBy: trackError\" class=\"frex-error\">{{error.message}}</li>\n    </ul>\n    ",
+                host: {
+                    '[class.frex-errors]': 'true',
+                    '[class.frex-no-errors]': '!hasErrors',
+                }
+            },] },
+];
+/** @nocollapse */
+InputErrorsComponent.ctorParameters = function () { return [
+    { type: SubmitGroup, decorators: [{ type: _angular_core.Optional },] },
+]; };
+InputErrorsComponent.propDecorators = {
+    'inputErrorsMap': [{ type: _angular_core.Input },],
+};
 function errorMessage(submittable, value, message) {
     if (message == null) {
         return undefined;
@@ -1118,15 +1104,6 @@ function errorMessage(submittable, value, message) {
     return message(value, submittable);
 }
 
-var __decorate$7 = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata$7 = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 var InputStatusDirective = (function () {
     function InputStatusDirective(_inputService) {
         this._inputService = _inputService;
@@ -1138,61 +1115,55 @@ var InputStatusDirective = (function () {
         enumerable: true,
         configurable: true
     });
-    __decorate$7([
-        _angular_core.HostBinding("class.frex-invalid"), 
-        __metadata$7('design:type', Boolean)
-    ], InputStatusDirective.prototype, "invalid", null);
-    InputStatusDirective = __decorate$7([
-        _angular_core.Directive({
-            selector: '[inputStatus]',
-        }), 
-        __metadata$7('design:paramtypes', [InputService])
-    ], InputStatusDirective);
     return InputStatusDirective;
 }());
+InputStatusDirective.decorators = [
+    { type: _angular_core.Directive, args: [{
+                selector: '[inputStatus]',
+            },] },
+];
+/** @nocollapse */
+InputStatusDirective.ctorParameters = function () { return [
+    { type: InputService, },
+]; };
+InputStatusDirective.propDecorators = {
+    'invalid': [{ type: _angular_core.HostBinding, args: ["class.frex-invalid",] },],
+};
 
-var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 var FormsExtraModule = (function () {
     function FormsExtraModule() {
     }
-    FormsExtraModule = __decorate([
-        _angular_core.NgModule({
-            imports: [
-                _angular_common.CommonModule,
-                _angular_forms.FormsModule,
-            ],
-            declarations: [
-                SubmitReadyDirective,
-                NonBlankDirective,
-                RepeatOfDirective,
-                InputDirective,
-                InputControlDirective,
-                InputErrorsComponent,
-                InputStatusDirective,
-            ],
-            exports: [
-                _angular_forms.FormsModule,
-                SubmitReadyDirective,
-                NonBlankDirective,
-                RepeatOfDirective,
-                InputDirective,
-                InputControlDirective,
-                InputErrorsComponent,
-                InputStatusDirective,
-            ]
-        }), 
-        __metadata('design:paramtypes', [])
-    ], FormsExtraModule);
     return FormsExtraModule;
 }());
+FormsExtraModule.decorators = [
+    { type: _angular_core.NgModule, args: [{
+                imports: [
+                    _angular_common.CommonModule,
+                    _angular_forms.FormsModule,
+                ],
+                declarations: [
+                    SubmitReadyDirective,
+                    NonBlankDirective,
+                    RepeatOfDirective,
+                    InputDirective,
+                    InputControlDirective,
+                    InputErrorsComponent,
+                    InputStatusDirective,
+                ],
+                exports: [
+                    _angular_forms.FormsModule,
+                    SubmitReadyDirective,
+                    NonBlankDirective,
+                    RepeatOfDirective,
+                    InputDirective,
+                    InputControlDirective,
+                    InputErrorsComponent,
+                    InputStatusDirective,
+                ]
+            },] },
+];
+/** @nocollapse */
+FormsExtraModule.ctorParameters = function () { return []; };
 
 exports.FormsExtraModule = FormsExtraModule;
 exports.InputDirective = InputDirective;

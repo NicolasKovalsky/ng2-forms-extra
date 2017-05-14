@@ -135,7 +135,7 @@ export declare const InputNotReady: InputStatus;
  *
  * @param control a control which status should be represented.
  */
-export declare function inputStatusControl(control: AbstractControl): InputStatus;
+export declare function inputStatusControl(control: AbstractControl | undefined): InputStatus;
 /**
  * Constructs input errors.
  *

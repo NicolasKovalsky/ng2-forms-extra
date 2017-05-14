@@ -13,19 +13,22 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,
-    "skipLibCheck": true,
+    "alwaysStrict": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmitOnError": true,
     "newLine": "LF",
     "lib": [
       "dom",
       "es5",
-      "es2015.promise",
-      "es2015.collection"
+      "es2015.collection",
+      "es2015.iterable",
+      "es2015.promise"
     ]
   },
   "include": [
-    "index.ts",
-    "src/**/*.ts"
-  ]
+    "./index.ts",
+    "./src/**/*.ts"
+  ],
+  "angularCompilerOptions": {
+    "genDir": "compiled"
+  }
 }

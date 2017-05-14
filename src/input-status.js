@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /**
  * Input status interface.
  *
@@ -15,7 +20,7 @@ var __extends = (this && this.__extends) || function (d, b) {
  *
  * Input status object is meant to be immutable.
  */
-export var InputStatus = (function () {
+var InputStatus = (function () {
     /**
      * Constructs input status.
      *
@@ -169,12 +174,14 @@ export var InputStatus = (function () {
     };
     return InputStatus;
 }());
+export { InputStatus };
 var combinedInputStatusId = "__combined__";
 var CombinedInputStatus = (function (_super) {
     __extends(CombinedInputStatus, _super);
     function CombinedInputStatus() {
-        _super.call(this, combinedInputStatusId);
-        this._map = {};
+        var _this = _super.call(this, combinedInputStatusId) || this;
+        _this._map = {};
+        return _this;
     }
     CombinedInputStatus.prototype.get = function (id) {
         return id === this.id ? this : this._map[id];
@@ -254,8 +261,9 @@ var inputReadinessId = "__readiness__";
 var InputReadiness = (function (_super) {
     __extends(InputReadiness, _super);
     function InputReadiness(_ready) {
-        _super.call(this, inputReadinessId);
-        this._ready = _ready;
+        var _this = _super.call(this, inputReadinessId) || this;
+        _this._ready = _ready;
+        return _this;
     }
     Object.defineProperty(InputReadiness.prototype, "ready", {
         get: function () {
@@ -300,8 +308,9 @@ var inputStatusControlId = "__control__";
 var InputStatusControl = (function (_super) {
     __extends(InputStatusControl, _super);
     function InputStatusControl(_control) {
-        _super.call(this, inputStatusControlId);
-        this._control = _control;
+        var _this = _super.call(this, inputStatusControlId) || this;
+        _this._control = _control;
+        return _this;
     }
     Object.defineProperty(InputStatusControl.prototype, "control", {
         get: function () {
@@ -342,8 +351,9 @@ var inputErrorsId = "__errors__";
 var InputErrors = (function (_super) {
     __extends(InputErrors, _super);
     function InputErrors(_errors) {
-        _super.call(this, inputErrorsId);
-        this._errors = _errors;
+        var _this = _super.call(this, inputErrorsId) || this;
+        _this._errors = _errors;
+        return _this;
     }
     Object.defineProperty(InputErrors.prototype, "errors", {
         get: function () {

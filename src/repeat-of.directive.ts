@@ -58,10 +58,13 @@ export class RepeatOfDirective implements Validator, OnDestroy {
             return;
         }
 
-        const control: NgControl = this._injector.get(NgControl);
+        const control = this._injector.get(NgControl).control;
+        const repeatOfControl = this._repeatOf.control;
 
-        this._repeatOfSubscr = this._repeatOf.control.valueChanges.subscribe(
-            value => control.control.updateValueAndValidity());
+        if (control && repeatOfControl) {
+            this._repeatOfSubscr = repeatOfControl.valueChanges.subscribe(
+                value => control.updateValueAndValidity());
+        }
     }
 
     private unsubscribe() {
