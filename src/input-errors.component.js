@@ -1,15 +1,3 @@
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 import { Component, Input, Optional } from "@angular/core";
 import { SubmitGroup } from "./model";
 var DEFAULT_INPUT_ERRORS_MAP = {
@@ -28,7 +16,7 @@ var DEFAULT_INPUT_ERRORS_MAP = {
     },
 };
 var resolved = Promise.resolve();
-export var InputErrorsComponent = (function () {
+var InputErrorsComponent = (function () {
     function InputErrorsComponent(_submitGroup) {
         this._submitGroup = _submitGroup;
         this._errors = [];
@@ -100,24 +88,26 @@ export var InputErrorsComponent = (function () {
         }
         return key;
     };
-    __decorate([
-        Input(), 
-        __metadata('design:type', Object)
-    ], InputErrorsComponent.prototype, "inputErrorsMap", void 0);
-    InputErrorsComponent = __decorate([
-        Component({
-            selector: 'input-errors,[inputErrors],[inputErrorsMap]',
-            template: "\n    <ul class=\"frex-error-list\" *ngIf=\"hasErrors\">\n        <li *ngFor=\"let error of errors; trackBy: trackError\" class=\"frex-error\">{{error.message}}</li>\n    </ul>\n    ",
-            host: {
-                '[class.frex-errors]': 'true',
-                '[class.frex-no-errors]': '!hasErrors',
-            }
-        }),
-        __param(0, Optional()), 
-        __metadata('design:paramtypes', [SubmitGroup])
-    ], InputErrorsComponent);
     return InputErrorsComponent;
 }());
+export { InputErrorsComponent };
+InputErrorsComponent.decorators = [
+    { type: Component, args: [{
+                selector: 'input-errors,[inputErrors],[inputErrorsMap]',
+                template: "\n    <ul class=\"frex-error-list\" *ngIf=\"hasErrors\">\n        <li *ngFor=\"let error of errors; trackBy: trackError\" class=\"frex-error\">{{error.message}}</li>\n    </ul>\n    ",
+                host: {
+                    '[class.frex-errors]': 'true',
+                    '[class.frex-no-errors]': '!hasErrors',
+                }
+            },] },
+];
+/** @nocollapse */
+InputErrorsComponent.ctorParameters = function () { return [
+    { type: SubmitGroup, decorators: [{ type: Optional },] },
+]; };
+InputErrorsComponent.propDecorators = {
+    'inputErrorsMap': [{ type: Input },],
+};
 function errorMessage(submittable, value, message) {
     if (message == null) {
         return undefined;

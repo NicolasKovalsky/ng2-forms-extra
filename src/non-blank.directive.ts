@@ -1,7 +1,6 @@
-import {NG_VALIDATORS, Validator, AbstractControl, Validators} from "@angular/forms";
+import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator, Validators} from "@angular/forms";
 import {Directive, forwardRef, Input} from "@angular/core";
 
-const VALID: {} = null!;
 const NOOP = () => {};
 
 @Directive({
@@ -17,7 +16,7 @@ const NOOP = () => {};
 export class NonBlankDirective implements Validator {
 
     private _required: boolean;
-    private _onChange: () => void = NOOP;
+    private _onChange: {(): void} = NOOP;
 
     get nonBlank(): boolean {
         return this._required;
@@ -29,8 +28,8 @@ export class NonBlankDirective implements Validator {
         this._onChange();
     }
 
-    validate(c: AbstractControl): {} {
-        return this.nonBlank ? Validators.required(c) : VALID;
+    validate(c: AbstractControl): ValidationErrors | null {
+        return this.nonBlank ? Validators.required(c) : null;
     }
 
     registerOnValidatorChange(fn: () => void): void {

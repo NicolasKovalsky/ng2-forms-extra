@@ -1,8 +1,8 @@
-import { Validator, AbstractControl } from "@angular/forms";
+import { AbstractControl, ValidationErrors, Validator } from "@angular/forms";
 export declare class NonBlankDirective implements Validator {
     private _required;
     private _onChange;
     nonBlank: boolean;
-    validate(c: AbstractControl): {};
+    validate(c: AbstractControl): ValidationErrors | null;
     registerOnValidatorChange(fn: () => void): void;
 }

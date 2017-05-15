@@ -6,7 +6,7 @@ var del = require('del');
 
 function compile(opts, cb) {
     exec(
-        'node_modules/.bin/tsc ' + opts,
+        'node_modules/.bin/ngc ' + opts,
         function (err, stdout, stderr) {
             console.log(stdout);
             if (err) {
@@ -25,8 +25,9 @@ gulp.task('watch-compile', function(cb) {
 
 gulp.task('clean-compiled', function () {
     return del([
-        './src/**/*.{d.ts,js,js.map}',
-        './index.{d.ts,js,js.map}'
+        './compiled',
+        './src/**/*.{d.ts,js,js.map,metadata.json}',
+        './index.{d.ts,js,js.map,metadata.json}',
     ]);
 });
 

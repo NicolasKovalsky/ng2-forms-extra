@@ -4,6 +4,7 @@ import {Subscription} from "rxjs";
 import {Submittable, SubmitGroup, RegistryHandle, SubmitService} from "./model";
 import {InputStatus, InputReady, InputNotReady, inputErrors} from "./input-status";
 import {inputStatusControl} from "./input-status";
+import {stat} from "fs";
 
 @Directive({
     selector: '[ngModel],[formControl],[formControlName]'
@@ -27,8 +28,8 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
         return this._inputStatus;
     }
 
-    get control(): AbstractControl {
-        return this._control.control;
+    get control(): AbstractControl | undefined {
+        return this._control.control || undefined;
     }
 
     updateInputStatus({emitEvents = true}: {emitEvents?: boolean} = {}): InputStatus {
@@ -50,15 +51,27 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
 
     private addReadiness(status: InputStatus) {
 
-        const affected = this.control.dirty || !this._submitService || this._submitService.submitted;
-        const ready = !(this.control.invalid && affected);
+        const control = this.control;
+
+        if (!control) {
+            return status.merge(InputReady);
+        }
+
+        const affected = control.dirty || !this._submitService || this._submitService.submitted;
+        const ready = !(control.invalid && affected);
 
         return status.merge(ready ? InputReady : InputNotReady);
     }
 
     private addErrors(status: InputStatus) {
 
-        const errors = this.control.errors;
+        const control = this.control;
+
+        if (!control) {
+            return status;
+        }
+
+        const errors = control.errors;
 
         if (errors) {
             return status.merge(inputErrors(errors));
@@ -70,7 +83,13 @@ export class InputControlDirective extends Submittable implements OnInit, OnDest
     ngOnInit() {
         this._preSubmitSubscr =
             this._submitService && this._submitService.preSubmit.subscribe(() => this.updateInputStatus());
-        this._stateSubscr = this.control.statusChanges.subscribe(() => this.updateInputStatus());
+
+        const control = this.control;
+
+        if (control) {
+            this._stateSubscr = control.statusChanges.subscribe(() => this.updateInputStatus());
+        }
+
         this.updateInputStatus({emitEvents: false});
         this._regHandle = this._submitGroup && this._submitGroup.addSubmittable(this);
     }

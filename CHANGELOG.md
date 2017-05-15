@@ -1,3 +1,15 @@
+# 0.4.0 (2017-05-15)
+
+### Dependencies
+
+* Switch to Angular 4.x.
+
+### Packaging
+
+* Enable ahead-of-time compilation.
+* Add Yarn support.
+
+
 # 0.2.2 (2016-12-15)
 
 ### Bugs

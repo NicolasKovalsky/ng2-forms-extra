@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 import { EventEmitter } from "@angular/core";
 import { InputReady } from "./input-status";
 /**
@@ -12,7 +17,7 @@ import { InputReady } from "./input-status";
  *
  * Submittable is responsible for its input status indication and updates.
  */
-export var Submittable = (function () {
+var Submittable = (function () {
     function Submittable() {
     }
     Object.defineProperty(Submittable.prototype, "ready", {
@@ -41,10 +46,11 @@ export var Submittable = (function () {
     });
     return Submittable;
 }());
+export { Submittable };
 /**
  * A utility registry implementation.
  */
-export var Registry = (function () {
+var Registry = (function () {
     function Registry() {
         this.changes = new EventEmitter();
         this._map = {};
@@ -84,6 +90,7 @@ export var Registry = (function () {
     };
     return Registry;
 }());
+export { Registry };
 var resolved = Promise.resolve();
 /**
  * A group of submittables represented as one submittable.
@@ -95,13 +102,14 @@ var resolved = Promise.resolve();
  *
  * This is a base class for concrete injectable service implementations. It is also used as a provider token.
  */
-export var SubmitGroup = (function (_super) {
+var SubmitGroup = (function (_super) {
     __extends(SubmitGroup, _super);
     function SubmitGroup() {
-        _super.call(this);
-        this.inputStatusChange = new EventEmitter();
-        this._registry = new Registry();
-        this._inputStatus = InputReady;
+        var _this = _super.call(this) || this;
+        _this.inputStatusChange = new EventEmitter();
+        _this._registry = new Registry();
+        _this._inputStatus = InputReady;
+        return _this;
     }
     Object.defineProperty(SubmitGroup.prototype, "inputStatus", {
         get: function () {
@@ -184,18 +192,20 @@ export var SubmitGroup = (function (_super) {
     };
     return SubmitGroup;
 }(Submittable));
+export { SubmitGroup };
 /**
  * Input service.
  *
  * An input service is registered by {{InputDirective}} to group one or more input fields.
  */
-export var InputService = (function (_super) {
+var InputService = (function (_super) {
     __extends(InputService, _super);
     function InputService() {
-        _super.apply(this, arguments);
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     return InputService;
 }(SubmitGroup));
+export { InputService };
 /**
  * Submit service.
  *
@@ -203,11 +213,12 @@ export var InputService = (function (_super) {
  * to this service automatically (either directly, or by {{InputService}}). It can be used to submit such forms when
  * they are ready.
  */
-export var SubmitService = (function (_super) {
+var SubmitService = (function (_super) {
     __extends(SubmitService, _super);
     function SubmitService() {
-        _super.apply(this, arguments);
-        this._submitted = false;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._submitted = false;
+        return _this;
     }
     Object.defineProperty(SubmitService.prototype, "submitted", {
         /**
@@ -229,4 +240,5 @@ export var SubmitService = (function (_super) {
     };
     return SubmitService;
 }(SubmitGroup));
+export { SubmitService };
 //# sourceMappingURL=model.js.map

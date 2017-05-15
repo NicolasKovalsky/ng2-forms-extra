@@ -4,3 +4,8 @@ node_modules
 *.log
 *.ts
 !*.d.ts
+!*.js.map
+!*.js
+!*.metadata.json
+!/bundles
+/compiled
