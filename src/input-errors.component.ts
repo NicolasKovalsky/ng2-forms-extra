@@ -1,6 +1,6 @@
-import {Component, Input, OnDestroy, Optional, OnInit} from "@angular/core";
-import {Subscription} from "rxjs";
-import {Submittable, SubmitGroup} from "./model";
+import { Component, Input, OnDestroy, Optional, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
+import { Submittable, SubmitGroup } from "./model";
 
 export interface InputErrorMap {
     [key: string]: string | ((error: any, submittable: Submittable) => string)
@@ -8,13 +8,13 @@ export interface InputErrorMap {
 
 const DEFAULT_INPUT_ERRORS_MAP: InputErrorMap = {
     required: "This field is required",
-    minlength: (error: {requiredLength: number}) => {
+    minlength: (error: { requiredLength: number }) => {
         if (error && error.requiredLength > 0) {
             return "The value should be at least " + error.requiredLength + " characters long";
         }
         return "The value is too short";
     },
-    maxlength: (error: {requiredLength: number}) => {
+    maxlength: (error: { requiredLength: number }) => {
         if (error && error.requiredLength > 0) {
             return "The value should be at most " + error.requiredLength + " characters long";
         }
@@ -33,9 +33,7 @@ const resolved = Promise.resolve();
     selector: 'input-errors,[inputErrors],[inputErrorsMap]',
     template:
     `
-    <ul class="frex-error-list" *ngIf="hasErrors">
-        <li *ngFor="let error of errors; trackBy: trackError" class="frex-error">{{error.message}}</li>
-    </ul>
+        <p *ngFor="let error of errors; trackBy: trackError" class="text-danger">{{error.message}}</p>
     `,
     host: {
         '[class.frex-errors]': 'true',
@@ -50,7 +48,7 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
     @Input()
     private inputErrorsMap: InputErrorMap = {};
 
-    constructor(@Optional() private _submitGroup: SubmitGroup) {
+    constructor( @Optional() private _submitGroup: SubmitGroup) {
     }
 
     get hasErrors(): boolean {
@@ -93,7 +91,7 @@ export class InputErrorsComponent implements OnInit, OnDestroy {
                             const message = this.errorMessage(submittable, key, errors[key]);
 
                             if (message != null) {
-                                this._errors.push({key, message});
+                                this._errors.push({ key, message });
                             }
                         }
                     }
