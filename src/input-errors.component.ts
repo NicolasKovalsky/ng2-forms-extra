@@ -33,7 +33,9 @@ const resolved = Promise.resolve();
     selector: 'input-errors,[inputErrors],[inputErrorsMap]',
     template:
     `
+    <ng-container *ngIf="hasErrors">
         <p *ngFor="let error of errors; trackBy: trackError" class="text-danger">{{error.message}}</p>
+        </ng-container>
     `,
     host: {
         '[class.frex-errors]': 'true',
