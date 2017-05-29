@@ -6,6 +6,5 @@ node_modules
 *.js.map
 *.metadata.json
 /index.js
-/src/**/*.js
 /bundles
 /compiled
