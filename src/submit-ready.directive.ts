@@ -2,7 +2,7 @@ import {Directive, HostListener, Output, EventEmitter, OnDestroy, forwardRef} fr
 import {SubmitService, SubmitGroup} from "./model";
 
 @Directive({
-    selector: 'form:not([ngNoForm]),ngForm,[ngForm],[formGroup]',
+    selector: 'form:not([ngNoForm]),ngForm,[ngForm],[formGroup]:not([noSubmitGroup])',
     exportAs: "frexSubmit",
     providers: [
         {
