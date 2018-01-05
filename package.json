@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsb -p tsconfig.build.json"
   },
-  "main": "bundles/ng2-forms-extra.umd.js",
+  "main": "index.js",
   "module": "index.js",
   "typings": "index.d.ts",
   "peerDependencies": {
