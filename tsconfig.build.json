@@ -1,0 +1,18 @@
+{
+    "extends": "./tsconfig.json", // Or a relative path to the default configs
+    "bundlerOptions": {
+        "entry": "./public_api.ts" // Do not call this barrel file "index.ts"
+    },
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "inlineSourceMap": false,
+        "sourceMap": false,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "removeComments": false,
+        "noImplicitAny": true,
+        "suppressImplicitAnyIndexErrors": true
+    }
+}

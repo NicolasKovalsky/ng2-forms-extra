@@ -14,6 +14,9 @@
     "type": "git",
     "url": "git@github.com:surol/ng2-forms-extra.git"
   },
+  "scripts": {
+    "build": "tsb -p tsconfig.build.json"
+  },
   "main": "bundles/ng2-forms-extra.umd.js",
   "module": "index.js",
   "typings": "index.d.ts",
@@ -39,6 +42,7 @@
     "rxjs": "^5.0.0",
     "source-map-loader": "^0.2.1",
     "typescript": "^2.1.0",
+    "typescript-library-bundler": "^0.2.3",
     "zone.js": "^0.8.0"
   },
   "dependencies": {}

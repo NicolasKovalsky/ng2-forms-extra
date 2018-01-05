@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "module": "es2015",
+    "module": "amd",
     "moduleResolution": "node",
     "removeComments": false,
+    "sourceMap": false,
     "declaration": true,
-    "sourceMap": true,
-    "inlineSources": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noImplicitAny": true,
@@ -14,6 +13,7 @@
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,
     "alwaysStrict": true,
+    "outFile": "index.js",
     "forceConsistentCasingInFileNames": true,
     "newLine": "LF",
     "lib": [
@@ -25,10 +25,7 @@
     ]
   },
   "include": [
-    "./index.ts",
+    "./public_api.ts",
     "./src/**/*.ts"
-  ],
-  "angularCompilerOptions": {
-    "genDir": "compiled"
-  }
+  ]
 }
